@@ -322,10 +322,248 @@
         .confirm-cancel:hover { background: var(--border); }
         .confirm-delete { background: var(--danger); color: white; }
         .confirm-delete:hover { background: #DC2626; }
+        .games-drawer {
+            position: fixed;
+            top: 0;
+            right: -460px;
+            width: 440px;
+            max-width: 92vw;
+            height: 100vh;
+            background: #ffffff;
+            border-left: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            z-index: 220;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .games-drawer.open { right: 0; }
+        .games-header {
+            padding: 18px 18px 14px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #ECFDF5 0%, #F0FDFA 100%);
+        }
+        .games-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .games-close {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .games-close:hover { background: var(--primary-light); color: var(--primary); }
+        .games-content { padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+        .game-card {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: #fff;
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .game-card h5 { font-size: 0.92rem; margin-bottom: 4px; }
+        .game-card p { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.45; }
+        .game-btn {
+            border: none;
+            background: linear-gradient(135deg, var(--primary), #896BFF);
+            color: #fff;
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .game-btn.alt {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        .breath-stage {
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .breath-bubble {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #8CF5E2, #10B981);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+            transition: transform 4s ease-in-out;
+        }
+        .breath-label { text-align: center; font-size: 0.84rem; font-weight: 600; margin-bottom: 8px; }
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .memory-card {
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #F8FAFC;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            user-select: none;
+            transition: var(--transition);
+        }
+        .memory-card.revealed,
+        .memory-card.matched {
+            background: var(--primary-light);
+            border-color: #C7D2FE;
+        }
+        .memory-card.matched { box-shadow: inset 0 0 0 2px #A7F3D0; }
+        .game-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .game-stat { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
+        .zen-board {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, #F0FDFA 0%, #E0F2FE 100%);
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        .zen-ripple {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(14,165,233,0.6);
+            transform: translate(-50%, -50%);
+            animation: rippleOut 1.3s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleOut {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0.9; }
+            to { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+        }
+        .a11y-sticky {
+            position: fixed;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 230;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .a11y-trigger {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #0EA5E9, #0369A1);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .a11y-panel {
+            display: none;
+            min-width: 220px;
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: var(--shadow-lg);
+        }
+        .a11y-panel.show { display: block; }
+        .a11y-title { font-size: 0.82rem; font-weight: 700; margin-bottom: 10px; }
+        .a11y-option { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.78rem; gap: 10px; }
+        .a11y-option label { flex: 1; }
+        .a11y-option input[type="checkbox"] { transform: scale(1.1); }
+        .a11y-btn-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .a11y-btn {
+            flex: 1;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 7px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: inherit;
+        }
+        .a11y-btn:hover { background: var(--primary-light); border-color: #C7D2FE; }
+        .a11y-size { font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 10px; }
+        body.a11y-high-contrast {
+            --bg-main: #FFFFFF;
+            --bg-chat: #FFFFFF;
+            --bg-sidebar: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #1F2937;
+            --text-muted: #374151;
+            --border: #111827;
+            --border-light: #9CA3AF;
+            --primary-light: #E0E7FF;
+            --bot-bubble: #FFFFFF;
+            --user-bubble: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%);
+        }
+        body.a11y-grayscale {
+            filter: grayscale(100%);
+        }
+        body.a11y-negative-contrast {
+            filter: invert(1) hue-rotate(180deg);
+        }
+        body.a11y-light-background {
+            --bg-main: #FDFDFD;
+            --bg-chat: #FFFFFF;
+            --bg-sidebar: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #374151;
+            --text-muted: #4B5563;
+            --border: #D1D5DB;
+            --border-light: #E5E7EB;
+            --primary-light: #EEF2FF;
+            --bot-bubble: #FFFFFF;
+        }
+        body.a11y-links-underline a {
+            text-decoration: underline !important;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 2px;
+        }
+        body.a11y-readable-font,
+        body.a11y-readable-font button,
+        body.a11y-readable-font input,
+        body.a11y-readable-font textarea {
+            font-family: Verdana, Tahoma, Arial, sans-serif !important;
+        }
     </style>
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar-overlay" id="gamesOverlay" onclick="closeGamesPanel()"></div>
     <div class="confirm-overlay" id="confirmOverlay">
         <div class="confirm-dialog">
             <h4><i class="fas fa-trash-can"></i> Delete Conversation</h4>
@@ -361,6 +599,7 @@
                 <li><button onclick="openRecommendation('yoga')"><i class="fas fa-spa" style="color:#10B981"></i> Yoga & Meditation</button></li>
                 <li><button onclick="openRecommendation('doctor')"><i class="fas fa-user-doctor" style="color:#6C63FF"></i> Find a Therapist</button></li>
                 <li><button onclick="openRecommendation('place')"><i class="fas fa-map-location-dot" style="color:#0EA5E9"></i> Peaceful Places</button></li>
+                <li><button onclick="openGamesPanel()"><i class="fas fa-gamepad" style="color:#059669"></i> Mind Relax Games</button></li>
             </ul>
         </div>
         <div class="sidebar-footer">
@@ -404,6 +643,83 @@
             <div class="input-hint">MindCare is an AI companion, not a replacement for professional help.</div>
         </div>
     </div>
+    <div class="a11y-sticky" aria-label="Accessibility tools">
+        <button class="a11y-trigger" onclick="toggleA11yPanel()" title="Accessibility">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <div class="a11y-panel" id="a11yPanel">
+            <div class="a11y-title">Accessibility Tools</div>
+            <div class="a11y-btn-row">
+                <button class="a11y-btn" onclick="increaseText()">Increase Text</button>
+                <button class="a11y-btn" onclick="decreaseText()">Decrease Text</button>
+            </div>
+            <div class="a11y-size" id="fontSizeValue">Text Size: 100%</div>
+            <div class="a11y-option">
+                <label for="grayscaleToggle">Grayscale</label>
+                <input id="grayscaleToggle" type="checkbox" onchange="toggleGrayscale(this.checked)">
+            </div>
+            <div class="a11y-option">
+                <label for="contrastToggle">High Contrast</label>
+                <input id="contrastToggle" type="checkbox" onchange="toggleHighContrast(this.checked)">
+            </div>
+            <div class="a11y-option">
+                <label for="negativeContrastToggle">Negative Contrast</label>
+                <input id="negativeContrastToggle" type="checkbox" onchange="toggleNegativeContrast(this.checked)">
+            </div>
+            <div class="a11y-option">
+                <label for="lightBackgroundToggle">Light Background</label>
+                <input id="lightBackgroundToggle" type="checkbox" onchange="toggleLightBackground(this.checked)">
+            </div>
+            <div class="a11y-option">
+                <label for="linksUnderlineToggle">Links Underline</label>
+                <input id="linksUnderlineToggle" type="checkbox" onchange="toggleLinksUnderline(this.checked)">
+            </div>
+            <div class="a11y-option" style="margin-bottom:0;">
+                <label for="readableFontToggle">Readable Font</label>
+                <input id="readableFontToggle" type="checkbox" onchange="toggleReadableFont(this.checked)">
+            </div>
+        </div>
+    </div>
+    <aside class="games-drawer" id="gamesDrawer" aria-label="Mind relaxing games">
+        <div class="games-header">
+            <h4><i class="fas fa-gamepad"></i> Mind Relax Games</h4>
+            <button class="games-close" onclick="closeGamesPanel()"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="games-content">
+            <div class="game-card">
+                <h5>1) Breathing Bubble</h5>
+                <p>Follow the breath cycle to slow down your heartbeat. Inhale, hold, and exhale with the animated bubble.</p>
+                <div class="breath-stage">
+                    <div class="breath-bubble" id="breathBubble"></div>
+                </div>
+                <div class="breath-label" id="breathLabel">Press start to begin a calm cycle.</div>
+                <div class="game-row">
+                    <button class="game-btn" onclick="startBreathingGame()">Start</button>
+                    <button class="game-btn alt" onclick="stopBreathingGame()">Stop</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h5>2) Memory Glow</h5>
+                <p>Match all pairs with slow, focused attention. This helps anchor your mind in the present moment.</p>
+                <div class="memory-grid" id="memoryGrid"></div>
+                <div class="game-row">
+                    <span class="game-stat" id="memoryStats">Moves: 0 | Pairs: 0/8</span>
+                    <button class="game-btn alt" onclick="resetMemoryGame()">Restart</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h5>3) Zen Ripple Garden</h5>
+                <p>Tap anywhere in the garden to create calming ripples. Try reaching a calm streak of 30 ripples.</p>
+                <div class="zen-board" id="zenBoard" onclick="spawnRipple(event)"></div>
+                <div class="game-row">
+                    <span class="game-stat" id="zenStats">Calm Streak: 0</span>
+                    <button class="game-btn alt" onclick="resetZenGarden()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </aside>
     <script>
         let currentConversationId = null;
         let conversations = [];
@@ -411,6 +727,13 @@
         let isTyping = false;
         let hasStarted = false;
         let pendingDeleteId = null;
+        let breathTimer = null;
+        let breathStep = 0;
+        let memoryDeck = [];
+        let memoryOpen = [];
+        let memoryMoves = 0;
+        let memoryMatches = 0;
+        let zenCount = 0;
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -423,6 +746,165 @@
         function toggleResources() {
             document.getElementById('resourcesToggle').classList.toggle('open');
             document.getElementById('resourcesList').classList.toggle('show');
+        }
+        function openGamesPanel() {
+            closeSidebar();
+            document.getElementById('gamesDrawer').classList.add('open');
+            document.getElementById('gamesOverlay').classList.add('show');
+        }
+        function closeGamesPanel() {
+            document.getElementById('gamesDrawer').classList.remove('open');
+            document.getElementById('gamesOverlay').classList.remove('show');
+        }
+        function toggleA11yPanel() {
+            document.getElementById('a11yPanel').classList.toggle('show');
+        }
+        let fontSizePercent = 100;
+        function applyFontSize() {
+            document.documentElement.style.fontSize = fontSizePercent + '%';
+            document.getElementById('fontSizeValue').textContent = 'Text Size: ' + fontSizePercent + '%';
+        }
+        function increaseText() {
+            fontSizePercent = Math.min(140, fontSizePercent + 5);
+            applyFontSize();
+        }
+        function decreaseText() {
+            fontSizePercent = Math.max(80, fontSizePercent - 5);
+            applyFontSize();
+        }
+        function toggleGrayscale(enabled) {
+            document.body.classList.toggle('a11y-grayscale', enabled);
+        }
+        function toggleHighContrast(enabled) {
+            if (enabled) {
+                document.body.classList.remove('a11y-negative-contrast');
+                const negative = document.getElementById('negativeContrastToggle');
+                if (negative) negative.checked = false;
+            }
+            document.body.classList.toggle('a11y-high-contrast', enabled);
+        }
+        function toggleNegativeContrast(enabled) {
+            if (enabled) {
+                document.body.classList.remove('a11y-high-contrast');
+                const high = document.getElementById('contrastToggle');
+                if (high) high.checked = false;
+            }
+            document.body.classList.toggle('a11y-negative-contrast', enabled);
+        }
+        function toggleLightBackground(enabled) {
+            document.body.classList.toggle('a11y-light-background', enabled);
+        }
+        function toggleLinksUnderline(enabled) {
+            document.body.classList.toggle('a11y-links-underline', enabled);
+        }
+        function toggleReadableFont(enabled) {
+            document.body.classList.toggle('a11y-readable-font', enabled);
+        }
+        function startBreathingGame() {
+            stopBreathingGame();
+            const bubble = document.getElementById('breathBubble');
+            const label = document.getElementById('breathLabel');
+            const steps = [
+                { text: 'Inhale gently for 4 seconds', scale: 1.55, duration: 4000 },
+                { text: 'Hold for 4 seconds', scale: 1.55, duration: 4000 },
+                { text: 'Exhale slowly for 6 seconds', scale: 1.0, duration: 6000 }
+            ];
+            function runStep() {
+                const s = steps[breathStep % steps.length];
+                label.textContent = s.text;
+                bubble.style.transitionDuration = (s.duration / 1000) + 's';
+                bubble.style.transform = 'scale(' + s.scale + ')';
+                breathStep += 1;
+                breathTimer = setTimeout(runStep, s.duration);
+            }
+            breathStep = 0;
+            runStep();
+        }
+        function stopBreathingGame() {
+            if (breathTimer) clearTimeout(breathTimer);
+            breathTimer = null;
+            breathStep = 0;
+            const bubble = document.getElementById('breathBubble');
+            const label = document.getElementById('breathLabel');
+            bubble.style.transitionDuration = '0.5s';
+            bubble.style.transform = 'scale(1)';
+            label.textContent = 'Press start to begin a calm cycle.';
+        }
+        function resetMemoryGame() {
+            const symbols = ['🌿','🍃','🌼','🕊️','🌙','💧','☁️','🧘'];
+            memoryDeck = symbols.concat(symbols).sort(() => Math.random() - 0.5).map((symbol, index) => ({
+                id: index,
+                symbol: symbol,
+                revealed: false,
+                matched: false
+            }));
+            memoryOpen = [];
+            memoryMoves = 0;
+            memoryMatches = 0;
+            renderMemoryGrid();
+        }
+        function renderMemoryGrid() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = memoryDeck.map((card) => {
+                const classes = ['memory-card'];
+                if (card.revealed) classes.push('revealed');
+                if (card.matched) classes.push('matched');
+                const face = (card.revealed || card.matched) ? card.symbol : '•';
+                return '<button class="' + classes.join(' ') + '" onclick="flipMemoryCard(' + card.id + ')" ' +
+                    (card.revealed || card.matched ? 'disabled' : '') + '>' + face + '</button>';
+            }).join('');
+            document.getElementById('memoryStats').textContent = 'Moves: ' + memoryMoves + ' | Pairs: ' + memoryMatches + '/8';
+        }
+        function flipMemoryCard(cardId) {
+            if (memoryOpen.length >= 2) return;
+            const card = memoryDeck.find((c) => c.id === cardId);
+            if (!card || card.revealed || card.matched) return;
+            card.revealed = true;
+            memoryOpen.push(card);
+            renderMemoryGrid();
+            if (memoryOpen.length === 2) {
+                memoryMoves += 1;
+                const [a, b] = memoryOpen;
+                if (a.symbol === b.symbol) {
+                    a.matched = true;
+                    b.matched = true;
+                    memoryMatches += 1;
+                    memoryOpen = [];
+                    renderMemoryGrid();
+                    if (memoryMatches === 8) {
+                        setTimeout(() => { alert('Great job. You completed Memory Glow mindfully.'); }, 120);
+                    }
+                } else {
+                    setTimeout(() => {
+                        a.revealed = false;
+                        b.revealed = false;
+                        memoryOpen = [];
+                        renderMemoryGrid();
+                    }, 700);
+                }
+            }
+        }
+        function spawnRipple(event) {
+            const board = document.getElementById('zenBoard');
+            const rect = board.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const ripple = document.createElement('span');
+            ripple.className = 'zen-ripple';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            board.appendChild(ripple);
+            zenCount += 1;
+            document.getElementById('zenStats').textContent = 'Calm Streak: ' + zenCount;
+            setTimeout(() => ripple.remove(), 1300);
+            if (zenCount === 30) {
+                setTimeout(() => { alert('Beautiful focus. You reached a calm streak of 30.'); }, 100);
+            }
+        }
+        function resetZenGarden() {
+            zenCount = 0;
+            document.getElementById('zenStats').textContent = 'Calm Streak: 0';
+            document.querySelectorAll('.zen-ripple').forEach((r) => r.remove());
         }
         function getCurrentTime() {
             const now = new Date();
@@ -652,7 +1134,13 @@
                 closeSidebar();
             }
         });
-        window.onload = function() { showWelcome(); loadConversations(); };
+        window.onload = function() {
+            showWelcome();
+            loadConversations();
+            resetMemoryGame();
+            resetZenGarden();
+            applyFontSize();
+        };
     </script>
 </body>
 </html>
