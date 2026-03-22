@@ -2,7 +2,7 @@
 
 This project is now configured for Render using a root Render blueprint file:
 - `render.yaml` at repo root
-- App root directory: `mental chatbot`
+- App root directory: `.`
 
 ## 1. Push latest code
 
@@ -16,7 +16,7 @@ Push all current changes to your GitHub repository.
 4. Confirm the service name and create deployment.
 
 If you choose **Web Service** manually instead of Blueprint, use:
-- Root Directory: `mental chatbot`
+- Root Directory: `.`
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `gunicorn app:app`
 

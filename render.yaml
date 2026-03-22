@@ -2,7 +2,7 @@ services:
   - type: web
     name: mindcare-chatbot
     env: python
-    rootDir: mental chatbot
+    rootDir: .
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
