@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — MindCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-dark: #5A52D5;
+        --accent: #00C9A7;
+        --bg: #F4F6FB;
+        --text: #1E1E2D;
+        --text-secondary: #6B7280;
+        --text-muted: #9CA3AF;
+        --border: #E5E7EB;
+        --error: #EF4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .auth-container {
+        width: 100%;
+        max-width: 440px;
+    }
+    .auth-brand {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+    .auth-brand a {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    .auth-brand-icon {
+        width: 44px; height: 44px;
+        background: linear-gradient(135deg, var(--primary), #896BFF);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1.3rem;
+        box-shadow: 0 4px 12px rgba(108,99,255,0.3);
+    }
+    .auth-brand span {
+        font-size: 1.3rem; font-weight: 700; color: var(--text);
+    }
+    .auth-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px 36px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    .auth-card h2 {
+        font-size: 1.5rem; font-weight: 700; color: var(--text);
+        margin-bottom: 6px;
+    }
+    .auth-card .subtitle {
+        font-size: 0.9rem; color: var(--text-secondary);
+        margin-bottom: 28px;
+    }
+    .form-group {
+        margin-bottom: 18px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.82rem; font-weight: 600; color: var(--text);
+        margin-bottom: 6px;
+    }
+    .form-input {
+        width: 100%;
+        padding: 13px 16px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.92rem;
+        font-family: inherit;
+        color: var(--text);
+        background: var(--bg);
+        transition: all 0.2s;
+        outline: none;
+    }
+    .form-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+        background: white;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .error-msg {
+        display: none;
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
+        color: var(--error);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        margin-bottom: 16px;
+        align-items: center;
+        gap: 8px;
+    }
+    .error-msg.show { display: flex; }
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary), #896BFF);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.25s;
+        box-shadow: 0 4px 14px rgba(108,99,255,0.25);
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(108,99,255,0.35);
+    }
+    .submit-btn:disabled {
+        opacity: 0.7; cursor: not-allowed; transform: none;
+    }
+    .spinner {
+        width: 18px; height: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .auth-footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+    }
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+    .divider {
+        display: flex; align-items: center; gap: 16px;
+        margin: 24px 0;
+    }
+    .divider::before, .divider::after {
+        content: ""; flex: 1; height: 1px; background: var(--border);
+    }
+    .divider span {
+        font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .input-icon-wrapper {
+        position: relative;
+    }
+    .input-icon-wrapper i {
+        position: absolute;
+        left: 14px; top: 50%; transform: translateY(-50%);
+        color: var(--text-muted); font-size: 0.9rem;
+    }
+    .input-icon-wrapper .form-input {
+        padding-left: 42px;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 14px; top: 50%; transform: translateY(-50%);
+        background: none; border: none;
+        color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+    }
+</style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-brand">
+        <a href="/">
+            <div class="auth-brand-icon"><i class="fas fa-heart-pulse"></i></div>
+            <span>MindCare</span>
+        </a>
+    </div>
+    <div class="auth-card">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to continue your journey</p>
+
+        <div class="error-msg" id="errorMsg">
+            <i class="fas fa-circle-exclamation"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <form id="signinForm" onsubmit="handleSignin(event)">
+            <div class="form-group">
+                <label>Email address</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" class="form-input" id="email" placeholder="you@example.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <div class="spinner" id="spinner"></div>
+                <span id="btnText">Sign In</span>
+            </button>
+        </form>
+    </div>
+    <div class="auth-footer">
+        Don't have an account? <a href="/signup">Create one</a>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const pw = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (pw.type === 'password') {
+        pw.type = 'text'; icon.className = 'fas fa-eye-slash';
+    } else {
+        pw.type = 'password'; icon.className = 'fas fa-eye';
+    }
+}
+
+async function handleSignin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const errorMsg = document.getElementById('errorMsg');
+    const errorText = document.getElementById('errorText');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Signing in...';
+    errorMsg.classList.remove('show');
+
+    try {
+        const resp = await fetch('/auth/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+            })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            errorText.textContent = data.error || 'Sign in failed.';
+            errorMsg.classList.add('show');
+        }
+    } catch (err) {
+        errorText.textContent = 'Network error. Please try again.';
+        errorMsg.classList.add('show');
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Sign In';
+    }
+}
+</script>
+</body>
+</html>

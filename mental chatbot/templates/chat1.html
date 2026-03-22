@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mental Health Chatbot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#dcdcdc;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* Phone Container */
+.phone {
+    width:360px;
+    height:640px;
+    background:white;
+    border-radius:30px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Background Video */
+video {
+    position:absolute;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-1;
+}
+
+/* Header */
+.header{
+    background:#075E54;
+    color:white;
+    padding:15px;
+    font-size:18px;
+    text-align:center;
+}
+
+/* Chat Box */
+#chatbox{
+    flex:1;
+    padding:10px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Message */
+.message{
+    max-width:75%;
+    padding:8px 12px;
+    margin:4px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+}
+
+.user{
+    background:#DCF8C6;
+    align-self:flex-end;
+}
+
+.bot{
+    background:white;
+    align-self:flex-start;
+}
+
+.icon{
+    font-size:14px;
+}
+
+/* Input Area */
+.input-area{
+    display:flex;
+    padding:8px;
+    background:#f0f0f0;
+}
+
+input{
+    flex:1;
+    padding:8px;
+    border-radius:20px;
+    border:none;
+    outline:none;
+    font-size:14px;
+}
+
+.send-btn, .mic-btn{
+    background:#075E54;
+    color:white;
+    border:none;
+    width:35px;
+    height:35px;
+    margin-left:5px;
+    border-radius:50%;
+    cursor:pointer;
+}
+
+/* Floating Menu */
+.menu-btn{
+    position:absolute;
+    bottom:80px;
+    right:10px;
+    background:#075E54;
+    color:white;
+    border:none;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.menu{
+    position:absolute;
+    bottom:130px;
+    right:10px;
+    display:none;
+    flex-direction:column;
+    gap:8px;
+}
+
+.menu button{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:none;
+    background:#128C7E;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Background Video -->
+<video autoplay muted loop>
+    <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+</video>
+
+<div class="phone">
+
+<div class="header">Mental Health Chatbot</div>
+
+<div id="chatbox"></div>
+
+<div class="input-area">
+    <input type="text" id="user-input" placeholder="Type message...">
+    <button class="mic-btn" onclick="startListening()">
+        <i class="fa fa-microphone"></i>
+    </button>
+    <button class="send-btn" onclick="sendMessage()">
+        <i class="fa fa-paper-plane"></i>
+    </button>
+</div>
+
+</div>
+
+<!-- Toggle Button -->
+<button class="menu-btn" onclick="toggleMenu()">+</button>
+
+<div class="menu" id="menu">
+    <button onclick="openRecommendation('youtube')"><i class="fab fa-youtube"></i></button>
+    <button onclick="openRecommendation('motivation')"><i class="fa fa-lightbulb"></i></button>
+    <button onclick="openRecommendation('yoga')"><i class="fa fa-spa"></i></button>
+    <button onclick="openRecommendation('doctor')"><i class="fa fa-user-doctor"></i></button>
+    <button onclick="openRecommendation('place')"><i class="fa fa-map-location-dot"></i></button>
+</div>
+
+<script>
+
+let lastStressLevel="NEUTRAL";
+
+function toggleMenu(){
+    let menu=document.getElementById("menu");
+    menu.style.display = menu.style.display==="flex" ? "none" : "flex";
+}
+
+async function sendMessage(){
+    let input=document.getElementById("user-input");
+    let message=input.value.trim();
+    if(!message) return;
+
+    let chatbox=document.getElementById("chatbox");
+
+    chatbox.innerHTML += `
+        <div class="message user">
+            <i class="fa fa-user icon"></i>
+            ${message}
+        </div>
+    `;
+
+    input.value="";
+
+    let response=await fetch("/get",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({message:message})
+    });
+
+    let data=await response.json();
+    lastStressLevel=data.stress_level;
+
+    chatbox.innerHTML += `
+        <div class="message bot">
+            <i class="fa fa-robot icon"></i>
+            ${data.response}
+        </div>
+    `;
+
+    chatbox.scrollTop=chatbox.scrollHeight;
+}
+
+async function openRecommendation(type){
+    let response=await fetch(`/recommend/${type}?stress_level=${lastStressLevel}`);
+    let data=await response.json();
+    if(data.url) window.open(data.url,"_blank");
+}
+
+function startListening(){
+    let recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+    recognition.lang="en-US";
+    recognition.start();
+    recognition.onresult=function(e){
+        document.getElementById("user-input").value=e.results[0][0].transcript;
+        sendMessage();
+    }
+}
+</script>
+
+</body>
+</html>
