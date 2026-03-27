@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relaxing Music — MindCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #16697A;
+        --primary-dark: #124E5A;
+        --card: #ffffff;
+        --border: rgba(0,0,0,0.08);
+        --bg: #F5FBFF;
+        --text: #172033;
+        --text-secondary: #5D6A7B;
+    }
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg);
+        margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    nav {
+        padding: 20px 48px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(244,246,251,0.85); backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .nav-brand { font-size: 1.45rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .nav-links { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--primary); }
+    .container { max-width: 1050px; margin: 84px auto 40px; padding: 0 24px; flex: 1; }
+    h1 { color: var(--text); margin-bottom: 10px; text-align: center; }
+    p.subtitle { color: var(--text-secondary); margin-bottom: 26px; text-align: center; }
+    .player-shell {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    .player-card, .list-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        padding: 20px;
+    }
+    .now-playing {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .track-title { font-size: 1.15rem; margin: 0 0 6px; color: var(--text); }
+    .track-artist { margin: 0 0 14px; color: var(--text-secondary); }
+    audio { width: 100%; margin-bottom: 14px; }
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(170px, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .opt {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    .opt input { accent-color: var(--primary); }
+    .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .btn {
+        border: none;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        font-family: inherit;
+    }
+    .btn.alt {
+        background: #e6f2f4;
+        color: var(--primary-dark);
+    }
+    .playlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .track-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+    .track-item.active {
+        border-color: var(--primary);
+        background: #f2fbfc;
+    }
+    .track-meta h3 { margin: 0 0 4px; font-size: 0.96rem; }
+    .track-meta p { margin: 0; color: var(--text-secondary); font-size: 0.82rem; }
+    .mini-play {
+        background: #ecfeff;
+        color: var(--primary-dark);
+        border: 1px solid #c7eef5;
+        border-radius: 8px;
+        padding: 7px 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-family: inherit;
+    }
+    .source-note {
+        margin-top: 14px;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+    @media (max-width: 860px) {
+        .player-shell { grid-template-columns: 1fr; }
+        nav { padding: 16px 18px; }
+        .nav-links { gap: 14px; }
+        .options { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand"><i class="fas fa-leaf"></i> MindCare</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/chat">Chat</a></li>
+            <li><a href="/therapists">Therapists</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Relaxing Music</h1>
+        <p class="subtitle">Play calm tracks, switch songs easily, and choose how your music should loop.</p>
+        <div class="player-shell">
+            <section class="player-card">
+                <div class="now-playing">Now Playing</div>
+                <h2 class="track-title" id="trackTitle">Forest Breath</h2>
+                <p class="track-artist" id="trackArtist">Ambient Waves</p>
+                <audio id="audioPlayer" controls preload="none"></audio>
+
+                <div class="options">
+                    <label class="opt"><input type="checkbox" id="loopCurrent"> Loop current track</label>
+                    <label class="opt"><input type="checkbox" id="autoNext" checked> Auto play next track</label>
+                    <label class="opt"><input type="checkbox" id="loopPlaylist"> Loop full playlist</label>
+                </div>
+
+                <div class="controls">
+                    <button class="btn alt" id="prevBtn"><i class="fas fa-backward"></i> Previous</button>
+                    <button class="btn" id="nextBtn">Next <i class="fas fa-forward"></i></button>
+                </div>
+
+                <div class="source-note">
+                    Free music resources: tracks use royalty-free audio links from Pixabay's free library.
+                </div>
+            </section>
+
+            <section class="list-card">
+                <ul class="playlist" id="playlist"></ul>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const tracks = [
+            {
+                title: 'Forest Breath',
+                artist: 'Ambient Waves',
+                src: 'https://cdn.pixabay.com/audio/2022/11/22/audio_5f3f4ef6e2.mp3'
+            },
+            {
+                title: 'Quiet Meditation',
+                artist: 'Slow Horizon',
+                src: 'https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3'
+            },
+            {
+                title: 'Soft Rain Piano',
+                artist: 'Gentle Focus',
+                src: 'https://cdn.pixabay.com/audio/2022/10/25/audio_9467fd0d7b.mp3'
+            },
+            {
+                title: 'Evening Calm',
+                artist: 'Mind Garden',
+                src: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c89.mp3'
+            }
+        ];
+
+        const audio = document.getElementById('audioPlayer');
+        const titleEl = document.getElementById('trackTitle');
+        const artistEl = document.getElementById('trackArtist');
+        const playlistEl = document.getElementById('playlist');
+        const loopCurrentEl = document.getElementById('loopCurrent');
+        const autoNextEl = document.getElementById('autoNext');
+        const loopPlaylistEl = document.getElementById('loopPlaylist');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        let currentIndex = 0;
+
+        function renderPlaylist() {
+            playlistEl.innerHTML = '';
+            tracks.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.className = 'track-item' + (index === currentIndex ? ' active' : '');
+                li.innerHTML = `
+                    <div class="track-meta">
+                        <h3>${track.title}</h3>
+                        <p>${track.artist}</p>
+                    </div>
+                    <button class="mini-play" data-index="${index}">Play</button>
+                `;
+                playlistEl.appendChild(li);
+            });
+            playlistEl.querySelectorAll('.mini-play').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    loadTrack(Number(btn.dataset.index), true);
+                });
+            });
+        }
+
+        function loadTrack(index, autoplay = false) {
+            currentIndex = index;
+            const track = tracks[currentIndex];
+            titleEl.textContent = track.title;
+            artistEl.textContent = track.artist;
+            audio.src = track.src;
+            audio.loop = loopCurrentEl.checked;
+            renderPlaylist();
+            if (autoplay) {
+                audio.play().catch(() => {});
+            }
+        }
+
+        function nextTrack(autoplay = true) {
+            const isLast = currentIndex === tracks.length - 1;
+            if (isLast && !loopPlaylistEl.checked) {
+                return;
+            }
+            currentIndex = (currentIndex + 1) % tracks.length;
+            loadTrack(currentIndex, autoplay);
+        }
+
+        function prevTrack() {
+            currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+            loadTrack(currentIndex, true);
+        }
+
+        loopCurrentEl.addEventListener('change', () => {
+            audio.loop = loopCurrentEl.checked;
+        });
+
+        audio.addEventListener('ended', () => {
+            if (loopCurrentEl.checked) {
+                return;
+            }
+            if (autoNextEl.checked) {
+                nextTrack(true);
+            }
+        });
+
+        prevBtn.addEventListener('click', prevTrack);
+        nextBtn.addEventListener('click', () => nextTrack(true));
+
+        loadTrack(0, false);
+    </script>
+</body>
+</html>

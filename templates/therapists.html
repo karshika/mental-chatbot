@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare | Find Therapists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #596273;
+            --mist: #e6eef7;
+            --sea: #007a78;
+            --sea-dark: #005f5d;
+            --sun: #f0b429;
+            --paper: #f7fbff;
+            --card: #ffffff;
+            --ring: rgba(0, 122, 120, 0.18);
+            --shadow: 0 12px 40px rgba(18, 38, 63, 0.12);
+            --radius: 18px;
+            --radius-lg: 24px;
+            --transition: all 220ms ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 5%, #fff7db 0%, rgba(255, 247, 219, 0) 35%),
+                radial-gradient(circle at 90% 0%, #daf5f4 0%, rgba(218, 245, 244, 0) 42%),
+                var(--paper);
+            min-height: 100vh;
+        }
+
+        nav {
+            width: min(1200px, 92%);
+            margin: 18px auto 0;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 999px;
+            box-shadow: 0 6px 24px rgba(18, 38, 63, 0.07);
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 10px;
+            z-index: 30;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--ink);
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .brand-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(150deg, #0f766e, #0891b2);
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ink);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 999px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover { background: #ecfeff; color: #0f766e; }
+
+        .nav-cta {
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: white;
+            background: linear-gradient(140deg, #007a78, #115e59);
+            padding: 10px 16px;
+            border-radius: 999px;
+            transition: var(--transition);
+        }
+
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0, 122, 120, 0.26); }
+
+        .shell {
+            width: min(1200px, 92%);
+            margin: 24px auto 48px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #073b4c, #0f766e 58%, #1d4ed8 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 34px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            animation: reveal 500ms ease;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            right: -80px;
+            top: -140px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+
+        .hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(1.6rem, 2.7vw, 2.5rem);
+            line-height: 1.2;
+            margin-bottom: 8px;
+            max-width: 760px;
+        }
+
+        .hero p {
+            max-width: 760px;
+            opacity: 0.92;
+            line-height: 1.65;
+            font-size: 1rem;
+        }
+
+        .hero-row {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid #e3edf7;
+            box-shadow: var(--shadow);
+        }
+
+        .filters {
+            padding: 18px;
+        }
+
+        .filters h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.08rem;
+            margin-bottom: 10px;
+        }
+
+        .filters p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+
+        .btn {
+            border: 1px solid #cddceb;
+            border-radius: 12px;
+            background: #fff;
+            color: var(--ink);
+            padding: 10px 12px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover { border-color: #8eb7d9; transform: translateY(-1px); }
+
+        .btn.primary {
+            border: none;
+            color: white;
+            background: linear-gradient(140deg, var(--sea), var(--sea-dark));
+        }
+
+        .btn.primary:hover { box-shadow: 0 8px 16px rgba(0, 122, 120, 0.24); }
+
+        .status {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f0f9ff;
+            border: 1px solid #dbeafe;
+            color: #1e3a8a;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            margin-bottom: 14px;
+        }
+
+        .legend {
+            display: grid;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .legend div { display: flex; align-items: center; gap: 8px; }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.chennai { background: #0ea5e9; }
+        .dot.near { background: #16a34a; }
+
+        .results {
+            display: grid;
+            grid-template-rows: 380px auto;
+            min-height: 700px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
+        }
+
+        .list-wrap { padding: 14px; }
+
+        .list-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .list-top h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+        }
+
+        .count {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(220px, 1fr));
+            gap: 10px;
+            max-height: 290px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .cards::-webkit-scrollbar { width: 6px; }
+        .cards::-webkit-scrollbar-thumb { background: #b8cde0; border-radius: 10px; }
+
+        .card {
+            border: 1px solid #dce8f3;
+            border-radius: 14px;
+            padding: 12px;
+            background: #ffffff;
+            transition: var(--transition);
+            animation: cardRise 340ms ease both;
+        }
+
+        .card:hover { border-color: #9fc3df; transform: translateY(-2px); }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #0b7285;
+            background: #e6f8fb;
+            border-radius: 999px;
+            padding: 4px 8px;
+            margin-bottom: 7px;
+        }
+
+        .card h4 {
+            font-size: 0.94rem;
+            line-height: 1.35;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 8px;
+            min-height: 34px;
+        }
+
+        .card-actions { display: flex; gap: 6px; }
+
+        .mini {
+            border: 1px solid #c8dcec;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--ink);
+            padding: 7px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .mini:hover { background: #f0f9ff; border-color: #8ab8da; }
+
+        .mini.primary {
+            border: none;
+            color: white;
+            background: linear-gradient(140deg, #0d9488, #0f766e);
+        }
+
+        .notes {
+            background: #fffaf0;
+            border: 1px solid #f7deb3;
+            border-radius: 14px;
+            padding: 14px;
+            color: #7c4a03;
+            line-height: 1.45;
+            font-size: 0.84rem;
+        }
+
+        @keyframes reveal {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardRise {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 980px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .results { grid-template-rows: 320px auto; min-height: 640px; }
+        }
+
+        @media (max-width: 640px) {
+            nav { border-radius: 18px; padding: 12px; }
+            .nav-links .nav-link:nth-child(2) { display: none; }
+            .hero { padding: 24px; }
+            .cards { grid-template-columns: 1fr; }
+            .btn-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">
+            <span class="brand-badge"><i class="fas fa-heart-pulse"></i></span>
+            <span>MindCare</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/chat">Chat Support</a>
+            {% if user %}
+                <a class="nav-cta" href="/chat">Continue Session</a>
+            {% else %}
+                <a class="nav-cta" href="/signin">Sign In</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="shell">
+        <section class="hero">
+            <h1>Find trusted therapists near you, with a focused directory for Chennai.</h1>
+            <p>
+                Use free and open resources to discover mental health professionals, view locations on an interactive map,
+                and open turn-by-turn directions from your current location.
+            </p>
+            <div class="hero-row">
+                <span class="pill"><i class="fa-solid fa-location-dot"></i> Chennai-first recommendations</span>
+                <span class="pill"><i class="fa-solid fa-map"></i> OpenStreetMap and Leaflet</span>
+                <span class="pill"><i class="fa-solid fa-route"></i> One-click direction links</span>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <aside class="panel filters">
+                <h2>Finder Controls</h2>
+                <p>Start with curated therapists in Chennai, or use your location to find nearby results from open map data.</p>
+
+                <div class="status" id="statusBox">Showing curated Chennai therapists.</div>
+
+                <div class="btn-row">
+                    <button id="showChennai" class="btn primary">Show Chennai</button>
+                    <button id="useMyLocation" class="btn">Use My Location</button>
+                </div>
+
+                <div class="btn-row">
+                    <button id="locateAgain" class="btn">Refresh Nearby</button>
+                    <button id="fitMap" class="btn">Fit All on Map</button>
+                </div>
+
+                <div class="legend">
+                    <div><span class="dot chennai"></span> Curated Chennai listings</div>
+                    <div><span class="dot near"></span> Nearby listings from free OSM data</div>
+                </div>
+            </aside>
+
+            <section class="panel results">
+                <div id="map"></div>
+                <div class="list-wrap">
+                    <div class="list-top">
+                        <h3 id="listTitle">Chennai Therapists</h3>
+                        <span class="count" id="resultCount">0 locations</span>
+                    </div>
+                    <div class="cards" id="cardsContainer"></div>
+                </div>
+            </section>
+        </section>
+
+        <section class="notes">
+            Directory information is for support and discovery. Please contact the provider directly to verify specialty,
+            schedule, and availability. In an emergency, reach local crisis services immediately.
+        </section>
+    </main>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <script>
+        const CHENNAI_THERAPISTS = [
+            {
+                name: 'Apollo Hospitals Psychiatry Department',
+                specialty: 'Psychiatry',
+                address: 'Greams Road, Chennai',
+                lat: 13.0637,
+                lon: 80.2518,
+                source: 'chennai'
+            },
+            {
+                name: 'SCARF India',
+                specialty: 'Mental Health Foundation',
+                address: 'Anna Nagar, Chennai',
+                lat: 13.0878,
+                lon: 80.2170,
+                source: 'chennai'
+            },
+            {
+                name: 'Kauvery Hospital Psychiatry Services',
+                specialty: 'Psychiatry and Counseling',
+                address: 'Alwarpet, Chennai',
+                lat: 13.0388,
+                lon: 80.2589,
+                source: 'chennai'
+            },
+            {
+                name: 'The Mind Research Foundation',
+                specialty: 'Counseling and Psychotherapy',
+                address: 'Mylapore, Chennai',
+                lat: 13.0332,
+                lon: 80.2697,
+                source: 'chennai'
+            },
+            {
+                name: 'SIMS Hospital Mental Health',
+                specialty: 'Psychological Medicine',
+                address: 'Vadapalani, Chennai',
+                lat: 13.0526,
+                lon: 80.2119,
+                source: 'chennai'
+            },
+            {
+                name: 'Fortis Malar Behavioral Health',
+                specialty: 'Behavioral Health',
+                address: 'Adyar, Chennai',
+                lat: 13.0077,
+                lon: 80.2571,
+                source: 'chennai'
+            }
+        ];
+
+        const CHENNAI_CENTER = [13.0827, 80.2707];
+
+        let map;
+        let userLocation = null;
+        let markers = [];
+        let activeResults = [...CHENNAI_THERAPISTS];
+
+        function setStatus(message, isError = false) {
+            const box = document.getElementById('statusBox');
+            box.textContent = message;
+            if (isError) {
+                box.style.background = '#fff1f2';
+                box.style.borderColor = '#fecdd3';
+                box.style.color = '#9f1239';
+            } else {
+                box.style.background = '#f0f9ff';
+                box.style.borderColor = '#dbeafe';
+                box.style.color = '#1e3a8a';
+            }
+        }
+
+        function initMap() {
+            map = L.map('map').setView(CHENNAI_CENTER, 11);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+        }
+
+        function clearMarkers() {
+            markers.forEach((m) => map.removeLayer(m));
+            markers = [];
+        }
+
+        function getDirectionLink(item) {
+            if (userLocation) {
+                return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${userLocation.lat}%2C${userLocation.lon}%3B${item.lat}%2C${item.lon}`;
+            }
+            return `https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lon}#map=15/${item.lat}/${item.lon}`;
+        }
+
+        function renderResults(results, title) {
+            activeResults = results;
+            clearMarkers();
+
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+            document.getElementById('listTitle').textContent = title;
+            document.getElementById('resultCount').textContent = `${results.length} locations`;
+
+            if (!results.length) {
+                container.innerHTML = '<div class="card"><h4>No therapists found</h4><p>Try using location again or switch back to Chennai listings.</p></div>';
+                return;
+            }
+
+            const bounds = [];
+
+            results.forEach((item, idx) => {
+                const markerColor = item.source === 'near' ? '#16a34a' : '#0ea5e9';
+                const marker = L.circleMarker([item.lat, item.lon], {
+                    radius: 8,
+                    color: markerColor,
+                    fillColor: markerColor,
+                    fillOpacity: 0.9,
+                    weight: 2
+                }).addTo(map);
+
+                marker.bindPopup(`<strong>${item.name}</strong><br>${item.address}`);
+                markers.push(marker);
+                bounds.push([item.lat, item.lon]);
+
+                const card = document.createElement('article');
+                card.className = 'card';
+                card.style.animationDelay = `${idx * 40}ms`;
+
+                const typeLabel = item.source === 'near' ? 'Nearby' : 'Chennai';
+
+                card.innerHTML = `
+                    <span class="tag">${typeLabel}</span>
+                    <h4>${item.name}</h4>
+                    <p>${item.specialty}<br>${item.address}</p>
+                    <div class="card-actions">
+                        <a class="mini" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + item.address)}" target="_blank" rel="noopener noreferrer">Open Map</a>
+                        <a class="mini primary" href="${getDirectionLink(item)}" target="_blank" rel="noopener noreferrer">Directions</a>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    map.setView([item.lat, item.lon], 14, { animate: true });
+                    marker.openPopup();
+                });
+
+                container.appendChild(card);
+            });
+
+            if (bounds.length === 1) {
+                map.setView(bounds[0], 14);
+            } else {
+                map.fitBounds(bounds, { padding: [40, 40] });
+            }
+        }
+
+        async function fetchNearbyTherapists(lat, lon) {
+            const viewbox = `${lon - 0.08},${lat + 0.08},${lon + 0.08},${lat - 0.08}`;
+            const urlPsychologist = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent('psychologist')}&limit=12&bounded=1&viewbox=${viewbox}`;
+            const urlPsychiatrist = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent('psychiatrist')}&limit=12&bounded=1&viewbox=${viewbox}`;
+
+            const headers = { 'Accept': 'application/json' };
+            const [resA, resB] = await Promise.all([
+                fetch(urlPsychologist, { headers }),
+                fetch(urlPsychiatrist, { headers })
+            ]);
+
+            if (!resA.ok || !resB.ok) {
+                throw new Error('Unable to fetch nearby therapist data from OpenStreetMap right now.');
+            }
+
+            const [a, b] = await Promise.all([resA.json(), resB.json()]);
+            const combined = [...a, ...b];
+
+            const seen = new Set();
+            const normalized = combined
+                .filter((item) => item && item.lat && item.lon && item.display_name)
+                .map((item) => {
+                    const parts = item.display_name.split(',');
+                    const name = (parts[0] || 'Therapist').trim();
+                    const address = parts.slice(1, 4).join(', ').trim() || item.display_name;
+                    return {
+                        id: item.place_id,
+                        name,
+                        specialty: item.type ? item.type.replace(/_/g, ' ') : 'Mental health support',
+                        address,
+                        lat: Number(item.lat),
+                        lon: Number(item.lon),
+                        source: 'near'
+                    };
+                })
+                .filter((item) => {
+                    const key = `${item.name.toLowerCase()}|${item.address.toLowerCase()}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                })
+                .slice(0, 12);
+
+            return normalized;
+        }
+
+        function requestLocationAndLoad() {
+            if (!navigator.geolocation) {
+                setStatus('Geolocation is not available in this browser. Showing Chennai listings.', true);
+                renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+                return;
+            }
+
+            setStatus('Getting your location and searching nearby therapists from OpenStreetMap...');
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                userLocation = {
+                    lat: Number(position.coords.latitude.toFixed(6)),
+                    lon: Number(position.coords.longitude.toFixed(6))
+                };
+
+                try {
+                    const nearby = await fetchNearbyTherapists(userLocation.lat, userLocation.lon);
+                    if (!nearby.length) {
+                        setStatus('No nearby results from OSM right now. Showing Chennai listings as fallback.', true);
+                        renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+                        return;
+                    }
+                    setStatus('Nearby therapist locations loaded. Click a card to highlight it on the map.');
+                    renderResults(nearby, 'Therapists Near You');
+                } catch (error) {
+                    console.error(error);
+                    setStatus('Could not load nearby OSM results now. Showing curated Chennai list.', true);
+                    renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+                }
+            }, () => {
+                setStatus('Location permission denied. Showing Chennai listings.', true);
+                renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+            }, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000
+            });
+        }
+
+        document.getElementById('showChennai').addEventListener('click', () => {
+            setStatus('Showing curated Chennai therapists.');
+            renderResults(CHENNAI_THERAPISTS, 'Chennai Therapists');
+        });
+
+        document.getElementById('useMyLocation').addEventListener('click', requestLocationAndLoad);
+        document.getElementById('locateAgain').addEventListener('click', requestLocationAndLoad);
+
+        document.getElementById('fitMap').addEventListener('click', () => {
+            if (!activeResults.length) return;
+            const points = activeResults.map((item) => [item.lat, item.lon]);
+            if (points.length === 1) {
+                map.setView(points[0], 14);
+                return;
+            }
+            map.fitBounds(points, { padding: [40, 40] });
+        });
+
+        initMap();
+    </script>
+</body>
+</html>

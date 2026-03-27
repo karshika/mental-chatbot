@@ -8,22 +8,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
     :root {
-        --primary: #6C63FF;
-        --primary-dark: #5A52D5;
-        --accent: #00C9A7;
-        --bg: #F4F6FB;
-        --text: #1E1E2D;
-        --text-secondary: #6B7280;
+        --primary: #16697A;
+        --primary-dark: #124E5A;
+        --accent: #F59E0B;
+        --bg: #F5FBFF;
+        --text: #172033;
+        --text-secondary: #5D6A7B;
+        --card-border: rgba(0,0,0,0.05);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background: var(--bg);
+        background:
+            radial-gradient(circle at 8% 8%, #fff3d9 0%, rgba(255,243,217,0) 34%),
+            radial-gradient(circle at 95% 4%, #d5f6ee 0%, rgba(213,246,238,0) 38%),
+            var(--bg);
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        color: var(--text);
     }
 
     /* Nav */
@@ -69,7 +74,7 @@
 
     .nav-cta {
         padding: 10px 28px;
-        background: var(--primary);
+        background: linear-gradient(140deg, var(--primary), #0D9488);
         color: white;
         border: none;
         border-radius: 50px;
@@ -85,7 +90,24 @@
     .nav-cta:hover {
         background: var(--primary-dark);
         transform: translateY(-1px);
-        box-shadow: 0 8px 24px rgba(108,99,255,0.35);
+        box-shadow: 0 8px 24px rgba(22,105,122,0.28);
+    }
+
+    .nav-ghost {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1.5px solid #D7E7EE;
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.86rem;
+        font-weight: 600;
+        transition: all 0.25s;
+    }
+
+    .nav-ghost:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #ECFEFF;
     }
 
     .nav-actions {
@@ -141,6 +163,7 @@
         max-width: 1200px;
         margin: 0 auto;
         width: 100%;
+        animation: fadeInUp 0.55s ease;
     }
 
     .hero-content {
@@ -173,7 +196,7 @@
     }
 
     .hero-content h1 span {
-        background: linear-gradient(135deg, var(--primary), var(--accent));
+        background: linear-gradient(135deg, #0F766E, var(--accent));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -195,7 +218,7 @@
 
     .btn-primary {
         padding: 15px 36px;
-        background: linear-gradient(135deg, var(--primary), #896BFF);
+        background: linear-gradient(135deg, var(--primary), #0F766E);
         color: white;
         border: none;
         border-radius: 14px;
@@ -208,12 +231,12 @@
         align-items: center;
         gap: 10px;
         transition: all 0.25s;
-        box-shadow: 0 6px 20px rgba(108,99,255,0.3);
+        box-shadow: 0 6px 20px rgba(22,105,122,0.3);
     }
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(108,99,255,0.4);
+        box-shadow: 0 10px 30px rgba(22,105,122,0.38);
     }
 
     .btn-secondary {
@@ -251,7 +274,7 @@
         border-radius: 28px;
         padding: 32px;
         box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-        border: 1px solid rgba(0,0,0,0.04);
+        border: 1px solid var(--card-border);
     }
 
     .hero-card-header {
@@ -384,7 +407,7 @@
         background: white;
         border-radius: 18px;
         padding: 28px;
-        border: 1px solid rgba(0,0,0,0.04);
+        border: 1px solid var(--card-border);
         transition: all 0.25s;
     }
 
@@ -404,9 +427,209 @@
         margin-bottom: 16px;
     }
 
-    .feature-card:nth-child(1) .feature-icon { background: #E8E6FF; color: var(--primary); }
-    .feature-card:nth-child(2) .feature-icon { background: #E0FFF8; color: var(--accent); }
+    .feature-card:nth-child(1) .feature-icon { background: #DDF5FB; color: #0C4A6E; }
+    .feature-card:nth-child(2) .feature-icon { background: #E0FFF8; color: #0F766E; }
     .feature-card:nth-child(3) .feature-icon { background: #FFF3E0; color: #F59E0B; }
+
+    .section-shell {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 48px;
+    }
+
+    .fold {
+        margin: 0 auto 26px;
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 22px;
+        box-shadow: 0 12px 36px rgba(23,32,51,0.06);
+        overflow: hidden;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+    }
+
+    .stat-item {
+        padding: 24px;
+        border-right: 1px solid #EEF2F7;
+        text-align: center;
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--primary);
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 0.83rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .journey-wrap {
+        padding: 34px;
+    }
+
+    .journey-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin-bottom: 18px;
+    }
+
+    .journey-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .journey-card {
+        border: 1px solid #E8EDF3;
+        border-radius: 16px;
+        padding: 18px;
+        background: linear-gradient(180deg, #FFFFFF, #F9FCFF);
+        transition: all 0.25s;
+    }
+
+    .journey-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(23,32,51,0.08);
+    }
+
+    .step-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(140deg, var(--primary), #0F766E);
+        margin-bottom: 12px;
+    }
+
+    .journey-card h4 {
+        font-size: 0.98rem;
+        margin-bottom: 7px;
+    }
+
+    .journey-card p {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .trust-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+        padding: 0;
+    }
+
+    .trust-left,
+    .trust-right {
+        padding: 28px;
+    }
+
+    .trust-left {
+        border-right: 1px solid #EEF2F7;
+    }
+
+    .trust-left h3,
+    .trust-right h3 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    .quote {
+        font-size: 0.9rem;
+        line-height: 1.75;
+        color: var(--text-secondary);
+        padding: 12px 14px;
+        border-left: 4px solid var(--accent);
+        background: #FFFBF0;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .help-list {
+        display: grid;
+        gap: 9px;
+        color: var(--text-secondary);
+        font-size: 0.84rem;
+    }
+
+    .help-list div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .help-list i { color: #0F766E; }
+
+    .cta-fold {
+        padding: 34px;
+        text-align: center;
+        background: linear-gradient(130deg, #083344 0%, #155E75 50%, #0F766E 100%);
+        color: white;
+    }
+
+    .cta-fold h3 {
+        font-size: 1.65rem;
+        margin-bottom: 10px;
+        letter-spacing: -0.6px;
+    }
+
+    .cta-fold p {
+        font-size: 0.92rem;
+        opacity: 0.92;
+        max-width: 600px;
+        margin: 0 auto 18px;
+        line-height: 1.7;
+    }
+
+    .cta-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-light {
+        padding: 12px 24px;
+        background: white;
+        color: #0B4A59;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-light {
+        padding: 12px 24px;
+        color: white;
+        border: 1.5px solid rgba(255,255,255,0.45);
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
     .feature-card h3 {
         font-size: 0.95rem;
@@ -442,6 +665,15 @@
             flex-direction: column;
             padding: 0 24px 48px;
         }
+
+        .section-shell { padding: 0 24px; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .stat-item:nth-child(2) { border-right: none; }
+        .journey-grid { grid-template-columns: 1fr; }
+        .trust-grid { grid-template-columns: 1fr; }
+        .trust-left { border-right: none; border-bottom: 1px solid #EEF2F7; }
+        .cta-fold { padding: 26px; }
+        .cta-fold h3 { font-size: 1.35rem; }
     }
 </style>
 </head>
@@ -453,6 +685,7 @@
         <span>MindCare</span>
     </a>
     <div class="nav-actions">
+        <a class="nav-ghost" href="/therapists">Find Therapists</a>
         {% if user %}
             <span class="nav-greeting">Hi, {{ user.full_name }} 👋</span>
             <a class="nav-cta" href="/chat">Go to Chat</a>
@@ -477,12 +710,18 @@
             <a class="btn-primary" href="/chat">
                 <i class="fas fa-message"></i> Continue Chatting
             </a>
+            <a class="btn-secondary" href="/therapists">
+                <i class="fas fa-user-doctor"></i> Find Therapists
+            </a>
             {% else %}
             <a class="btn-primary" href="/signup">
                 <i class="fas fa-message"></i> Get Started — Free
             </a>
             <a class="btn-secondary" href="/signin">
                 <i class="fas fa-right-to-bracket"></i> Sign In
+            </a>
+            <a class="btn-secondary" href="/therapists">
+                <i class="fas fa-map-location-dot"></i> Explore Therapists
             </a>
             {% endif %}
         </div>
@@ -518,7 +757,7 @@
     <div class="feature-card">
         <div class="feature-icon"><i class="fas fa-brain"></i></div>
         <h3>AI-Powered Empathy</h3>
-        <p>Backed by Mistral AI, MindCare understands context and responds with genuine warmth and evidence-based support.</p>
+        <p>MindCare understands context and responds with genuine warmth and evidence-based support.</p>
     </div>
     <div class="feature-card">
         <div class="feature-icon"><i class="fas fa-lock"></i></div>
@@ -529,6 +768,80 @@
         <div class="feature-icon"><i class="fas fa-hand-holding-heart"></i></div>
         <h3>Holistic Resources</h3>
         <p>Access calming videos, yoga guides, motivational content, and find nearby therapists — all in one place.</p>
+    </div>
+</section>
+
+<section class="section-shell">
+    <div class="fold">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Always-on AI companion</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3 Mins</div>
+                <div class="stat-label">Average time to start support</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">6+</div>
+                <div class="stat-label">Therapist locations in Chennai</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1 Space</div>
+                <div class="stat-label">Chat, calm tools, and referrals</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fold journey-wrap">
+        <h3 class="journey-title">Your care journey in three clear steps</h3>
+        <div class="journey-grid">
+            <div class="journey-card">
+                <span class="step-chip">1</span>
+                <h4>Share what you are feeling</h4>
+                <p>Talk to MindCare in a calm, non-judgmental space. The assistant responds with empathy and practical coping guidance.</p>
+            </div>
+            <div class="journey-card">
+                <span class="step-chip">2</span>
+                <h4>Use wellness tools instantly</h4>
+                <p>Access breathing, grounding resources, and supportive recommendations tailored to your current emotional state.</p>
+            </div>
+            <div class="journey-card">
+                <span class="step-chip">3</span>
+                <h4>Find local therapists with maps</h4>
+                <p>Open the therapist directory, view Chennai-focused listings, and use direction links to navigate easily.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fold trust-grid">
+        <div class="trust-left">
+            <h3>What users value most</h3>
+            <div class="quote">"It helps me pause and reflect before things feel overwhelming. The guidance is clear and kind."</div>
+            <div class="quote">"I like that I can talk at any hour and then quickly find therapist options in my city when I need more support."</div>
+        </div>
+        <div class="trust-right">
+            <h3>Built for safer mental wellness support</h3>
+            <div class="help-list">
+                <div><i class="fas fa-shield-heart"></i> Emotional support with crisis-aware responses</div>
+                <div><i class="fas fa-map-pin"></i> Chennai-centered therapist discovery with map view</div>
+                <div><i class="fas fa-route"></i> Quick direction links for real-world follow-up care</div>
+                <div><i class="fas fa-seedling"></i> Gentle, practical coping suggestions in everyday language</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fold cta-fold">
+        <h3>Need professional help nearby?</h3>
+        <p>Browse therapist options in Chennai, open locations on the map, and get route directions in one click.</p>
+        <div class="cta-actions">
+            <a class="btn-light" href="/therapists"><i class="fas fa-user-doctor"></i> Open Therapist Finder</a>
+            {% if user %}
+            <a class="btn-outline-light" href="/chat"><i class="fas fa-message"></i> Continue MindCare Chat</a>
+            {% else %}
+            <a class="btn-outline-light" href="/signup"><i class="fas fa-right-to-bracket"></i> Create Free Account</a>
+            {% endif %}
+        </div>
     </div>
 </section>
 

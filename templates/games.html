@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Relax Games — MindCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #16697A;
+        --primary-dark: #124E5A;
+        --bg: #F5FBFF;
+        --text: #172033;
+        --text-secondary: #5D6A7B;
+        --card-border: rgba(0,0,0,0.05);
+        --primary-light: #e0f2f1;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg);
+        margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    nav {
+        padding: 20px 48px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(244,246,251,0.85); backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .nav-brand { font-size: 1.45rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .nav-links { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--primary); }
+    
+    .container { max-width: 1100px; margin: 100px auto 40px; padding: 0 24px; flex: 1; }
+    h1 { color: var(--text); margin-bottom: 12px; text-align: center; }
+    p.subtitle { color: var(--text-secondary); margin-bottom: 40px; text-align: center; }
+    
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+    .game-card {
+        background: #fff; border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--card-border);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .game-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .game-card h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--primary-dark); }
+    .game-card p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .play-btn {
+        display: inline-block; padding: 10px 20px; background: var(--primary); color: #fff; text-decoration: none;
+        border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;
+    }
+    .play-btn:hover { background: var(--primary-dark); }
+
+    /* Modal styles for the actual game */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
+        display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+        background: #fff; border-radius: 16px; width: 100%; max-width: 600px; overflow: hidden; position: relative;
+    }
+    .modal-header {
+        padding: 16px 24px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h3 { margin: 0; font-size: 1.25rem; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; }
+    .close-btn:hover { color: #ef4444; }
+    .modal-body { padding: 24px; text-align: center; max-height: 70vh; overflow-y: auto; }
+
+    /* Game UI containers */
+    #gameArea { min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    
+    /* Bubble Pop Styles */
+    .bubble {
+        position: absolute; border-radius: 50%; opacity: 0.7; cursor: pointer;
+        animation: float 4s ease-in forwards; background: radial-gradient(circle at 30% 30%, #fff, #0ea5e9);
+        box-shadow: 0 4px 8px rgba(14,165,233,0.3);
+    }
+    @keyframes float { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-400px) scale(1.2); opacity: 0; } }
+    .bubbleArea { position: relative; width: 100%; height: 350px; overflow: hidden; background: #f0f9ff; border-radius: 12px; }
+    
+    /* Breathing Styles */
+    .breathing-circle {
+        width: 150px; height: 150px; border-radius: 50%; background: #16697A; color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;
+        margin: 0 auto; box-shadow: 0 10px 25px rgba(22,105,122,0.3); transition: transform 0.1s;
+    }
+
+    /* Coloring Styles */
+    #colorCanvas { border: 1px solid #ccc; border-radius: 8px; cursor: crosshair; touch-action: none; background: #fff; }
+    
+    /* Connect dots styles */
+    .star { position: absolute; width: 12px; height: 12px; background: #f59e0b; border-radius: 50%; cursor: pointer; }
+</style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand"><i class="fas fa-leaf"></i> MindCare</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/chat">Chat</a></li>
+            <li><a href="/therapists">Therapists</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Mind Relaxing Games</h1>
+        <p class="subtitle">Take a break to calm your mind and refocus with our collection of simple, relaxing games.</p>
+        
+        <div class="game-grid">
+            <div class="game-card">
+                <h3><i class="fas fa-wind" style="color: #0ea5e9;"></i> Bubble Pop</h3>
+                <p>Pop floating bubbles to relieve stress. Each pop is a release of tension. Click on them before they float away.</p>
+                <button class="play-btn" onclick="openGame('bubble')">Play Game</button>
+            </div>
+            
+            <div class="game-card">
+                <h3><i class="fas fa-lungs" style="color: #10b981;"></i> 4-7-8 Breathing</h3>
+                <p>A guided breathing exercise to calm your nervous system. Inhale for 4s, hold for 7s, exhale for 8s.</p>
+                <button class="play-btn" onclick="openGame('breathing')">Start Exercise</button>
+            </div>
+
+            <div class="game-card">
+                <h3><i class="fas fa-paint-brush" style="color: #f59e0b;"></i> Zen Doodle</h3>
+                <p>Doodle freely on a blank canvas. Let your mind wander as you draw simple shapes and colors.</p>
+                <button class="play-btn" onclick="openGame('doodle')">Start Drawing</button>
+            </div>
+
+            <div class="game-card">
+                <h3><i class="fas fa-star" style="color: #8b5cf6;"></i> Connect the Stars</h3>
+                <p>Connect stars to form a beautiful constellation. A slow, meditative focus exercise.</p>
+                <button class="play-btn" onclick="openGame('stars')">Play Game</button>
+            </div>
+            
+            <div class="game-card">
+                <h3><i class="fas fa-seedling" style="color: #84cc16;"></i> Grow a Plant</h3>
+                <p>Click repeatedly to nurture and grow a small digital plant. Watch it bloom with each click.</p>
+                <button class="play-btn" onclick="openGame('plant')">Play Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for game execution -->
+    <div class="modal-overlay" id="gameModal" onclick="if(event.target===this) closeGame()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="gameTitle">Game Title</h3>
+                <button class="close-btn" onclick="closeGame()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="gameArea"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGameInterval = null;
+        let animationFrame = null;
+
+        function openGame(type) {
+            document.getElementById('gameModal').classList.add('active');
+            const area = document.getElementById('gameArea');
+            area.innerHTML = '';
+            clearInterval(currentGameInterval);
+            cancelAnimationFrame(animationFrame);
+            
+            if (type === 'bubble') {
+                document.getElementById('gameTitle').innerText = 'Bubble Pop';
+                area.innerHTML = '<div class="bubbleArea" id="bubbleCanvas"></div><p id="score" style="margin-top:15px; font-weight:bold;">Popped: 0</p>';
+                startBubbleGame();
+            } else if (type === 'breathing') {
+                document.getElementById('gameTitle').innerText = '4-7-8 Breathing';
+                area.innerHTML = '<div class="breathing-circle" id="breathCircle">Inhale</div><p style="margin-top:20px; color:#5D6A7B;">Follow the circle to relax your body and mind.</p>';
+                startBreathing();
+            } else if (type === 'doodle') {
+                document.getElementById('gameTitle').innerText = 'Zen Doodle';
+                area.innerHTML = '<canvas id="colorCanvas" width="500" height="300"></canvas><div style="margin-top:10px;"><button onclick="clearCanvas()" style="padding:6px 12px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">Clear</button></div>';
+                startDoodle();
+            } else if (type === 'stars') {
+                document.getElementById('gameTitle').innerText = 'Connect the Stars';
+                area.innerHTML = '<div class="bubbleArea" id="starCanvas" style="background:#1e293b;"></div>';
+                startStars();
+            } else if (type === 'plant') {
+                document.getElementById('gameTitle').innerText = 'Grow a Plant';
+                area.innerHTML = '<div><p id="plantState" style="font-size: 5rem; margin:20px 0;">\ud83c\udf31</p><button onclick="growPlant()" class="play-btn">Water Plant \ud83d\udca7</button><p id="plantMsg" style="margin-top:15px; color:#5D6A7B;">Keep watering to see it grow!</p></div>';
+                window.plantStage = 0;
+            }
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').classList.remove('active');
+            clearInterval(currentGameInterval);
+            cancelAnimationFrame(animationFrame);
+            document.getElementById('gameArea').innerHTML = '';
+        }
+
+        // Bubble Game
+        function startBubbleGame() {
+            let score = 0;
+            const canvas = document.getElementById('bubbleCanvas');
+            const scoreEl = document.getElementById('score');
+            
+            currentGameInterval = setInterval(() => {
+                if(!document.getElementById('bubbleCanvas')) return clearInterval(currentGameInterval);
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 30 + 30;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = (Math.random() * 90) + '%';
+                bubble.style.bottom = '-40px';
+                let colors = ['#0ea5e9', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6'];
+                bubble.style.background = `radial-gradient(circle at 30% 30%, #fff, ${colors[Math.floor(Math.random()*colors.length)]})`;
+                
+                bubble.onclick = function() {
+                    score++;
+                    scoreEl.innerText = 'Popped: ' + score;
+                    this.remove();
+                };
+                
+                canvas.appendChild(bubble);
+                setTimeout(() => { if(bubble.parentNode) bubble.remove(); }, 3800);
+            }, 800);
+        }
+
+        // Breathing Game
+        function startBreathing() {
+            const circle = document.getElementById('breathCircle');
+            if(!circle) return;
+            
+            let phase = 0; // 0=inhale, 1=hold, 2=exhale
+            const textContent = ['Inhale (4s)', 'Hold (7s)', 'Exhale (8s)'];
+            const scale = [1.5, 1.5, 1.0];
+            const times = [4000, 7000, 8000];
+            const colors = ['#16697A', '#0ea5e9', '#124E5A'];
+            
+            function step() {
+                if(!document.getElementById('breathCircle')) return;
+                circle.innerText = textContent[phase];
+                circle.style.transition = `transform ${times[phase]/1000}s linear, background 0.5s`;
+                circle.style.transform = `scale(${scale[phase]})`;
+                circle.style.background = colors[phase];
+                
+                setTimeout(() => {
+                    phase = (phase + 1) % 3;
+                    step();
+                }, times[phase]);
+            }
+            // Ensure first transition kicks in by a slight delay
+            setTimeout(step, 100);
+        }
+
+        // Doodle Game
+        function startDoodle() {
+            const canvas = document.getElementById('colorCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0, lastY = 0;
+            let hue = 0;
+
+            function draw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                let x = e.offsetX || (e.touches && (e.touches[0].clientX - canvas.getBoundingClientRect().left));
+                let y = e.offsetY || (e.touches && (e.touches[0].clientY - canvas.getBoundingClientRect().top));
+                
+                ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                [lastX, lastY] = [x, y];
+                hue++;
+                if(hue >= 360) hue = 0;
+            }
+
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; });
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mouseout', () => isDrawing = false);
+            
+            canvas.addEventListener('touchstart', (e) => { 
+                isDrawing = true; 
+                let rect = canvas.getBoundingClientRect();
+                lastX = e.touches[0].clientX - rect.left; 
+                lastY = e.touches[0].clientY - rect.top; 
+            }, {passive: false});
+            canvas.addEventListener('touchmove', draw, {passive: false});
+            canvas.addEventListener('touchend', () => isDrawing = false);
+        }
+        function clearCanvas() {
+            const canvas = document.getElementById('colorCanvas');
+            if(canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // Stars Game
+        function startStars() {
+            const cvs = document.getElementById('starCanvas');
+            if(!cvs) return;
+            
+            let starsRendered = 0;
+            let coords = [];
+            for(let i=0; i<8; i++){
+                coords.push({x: Math.random()*80 + 10, y: Math.random()*80 + 10});
+            }
+            
+            let lastStar = null;
+            coords.forEach((c, idx) => {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = c.x + '%';
+                s.style.top = c.y + '%';
+                s.onclick = function() {
+                    this.style.background = '#fff';
+                    this.style.boxShadow = '0 0 10px #fff';
+                    if(lastStar && lastStar !== this) {
+                        const line = document.createElement('div');
+                        line.style.position = 'absolute';
+                        line.style.background = 'rgba(255,255,255,0.4)';
+                        line.style.height = '2px';
+                        line.style.transformOrigin = 'left center';
+                        
+                        const lx = parseFloat(lastStar.style.left)*cvs.clientWidth/100 + 6;
+                        const ly = parseFloat(lastStar.style.top)*cvs.clientHeight/100 + 6;
+                        const tx = parseFloat(this.style.left)*cvs.clientWidth/100 + 6;
+                        const ty = parseFloat(this.style.top)*cvs.clientHeight/100 + 6;
+                        
+                        const angle = Math.atan2(ty - ly, tx - lx) * 180 / Math.PI;
+                        const length = Math.sqrt(Math.pow(tx - lx, 2) + Math.pow(ty - ly, 2));
+                        
+                        line.style.width = length + 'px';
+                        line.style.left = lx + 'px';
+                        line.style.top = ly + 'px';
+                        line.style.transform = `rotate(${angle}deg)`;
+                        cvs.appendChild(line);
+                    }
+                    lastStar = this;
+                };
+                cvs.appendChild(s);
+            });
+        }
+
+        // Plant Game
+        function growPlant() {
+            const states = ['\ud83c\udf31', '\ud83c\udf3f', '\ud83c\udf40', '\ud83c\udf37', '\ud83c\udf3a'];
+            const msgs = ['A small sprout!', 'It is growing leaves!', 'Getting bigger!', 'A flower bud appears!', 'Fully bloomed! Take a deep breath.'];
+            if(window.plantStage < states.length - 1) {
+                window.plantStage++;
+                document.getElementById('plantState').innerText = states[window.plantStage];
+                document.getElementById('plantState').style.transform = `scale(${1 + window.plantStage * 0.1})`;
+                document.getElementById('plantState').style.transition = 'transform 0.3s ease';
+                document.getElementById('plantMsg').innerText = msgs[window.plantStage];
+            } else {
+                document.getElementById('plantMsg').innerText = 'The plant is full grown! Beautiful!';
+            }
+        }
+    </script>
+
+    <!-- Optional translate widget integration so games page can be translated as well -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element_games');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <div id="google_translate_element_games" style="position:fixed; bottom: 10px; right: 10px; z-index: 1000;"></div>
+</body>
+</html>

@@ -16,6 +16,20 @@ MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "")
 mistral_client = Mistral(api_key=MISTRAL_API_KEY)
 MISTRAL_MODEL = "mistral-large-latest"
 
+
+_MISTRAL_OPEN_SOURCE_TRAINING_DUMMY = {
+    "provider": "Mistral AI (open source)",
+    "base_model": "",
+    "weights_path": "hf://mistralai/Mistral-7B-Instruct-v0.3",
+    "train_path": "hf://datasets/mental-support-chat/train.jsonl",
+    "validation_path": "hf://datasets/mental-support-chat/validation.jsonl",
+    "test_path": "hf://datasets/mental-support-chat/test.jsonl",
+    "use_in_runtime": False,
+}
+
+def mistral_training() -> str:
+    return " "
+
 # ---------- SUPABASE ----------
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")  # anon key for auth
@@ -176,6 +190,21 @@ MOTIVATION_LINKS = [
 def home():
     user = session.get("user")
     return render_template("home.html", user=user)
+
+@app.route("/therapists")
+def therapists_page():
+    user = session.get("user")
+    return render_template("therapists.html", user=user)
+
+@app.route("/games")
+def games_page():
+    user = session.get("user")
+    return render_template("games.html", user=user)
+
+@app.route("/music")
+def music_page():
+    user = session.get("user")
+    return render_template("music.html", user=user)
 
 # ---- AUTH ----
 @app.route("/signup")
@@ -340,7 +369,7 @@ def recommend(rec_type):
     elif rec_type == "yoga":
         url = "https://www.youtube.com/results?search_query=yoga+for+stress+relief" if stress_level == "STRESS" else "https://www.youtube.com/results?search_query=gentle+yoga+for+beginners"
     elif rec_type == "doctor":
-        url = "https://www.psychologytoday.com/us/therapists"
+        url = url_for("therapists_page")
     elif rec_type == "place":
         url = "https://www.google.com/maps/search/peaceful+parks+near+me"
     return jsonify({"url": url})
