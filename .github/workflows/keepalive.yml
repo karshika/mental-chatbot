@@ -1,0 +1,25 @@
+name: Keep Render and Supabase Awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run keep-alive script
+        env:
+          KEEPALIVE_RENDER_URL: ${{ secrets.KEEPALIVE_RENDER_URL }}
+          KEEPALIVE_SUPABASE_URL: ${{ secrets.KEEPALIVE_SUPABASE_URL }}
+          KEEPALIVE_SUPABASE_KEY: ${{ secrets.KEEPALIVE_SUPABASE_KEY }}
+        run: python scripts/keep_alive.py

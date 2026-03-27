@@ -39,6 +39,37 @@
     p.subtitle { color: var(--text-secondary); margin-bottom: 40px; text-align: center; }
     
     .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+    .stats-panel {
+        background: #fff;
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 22px;
+        box-shadow: var(--shadow-sm);
+    }
+    .stats-panel h3 {
+        margin: 0 0 8px;
+        color: var(--primary-dark);
+        font-size: 1.02rem;
+    }
+    .stats-status {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+    }
+    .stats-card {
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 10px;
+        background: #FBFDFF;
+    }
+    .stats-card .name { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .stats-card .meta { font-size: 0.75rem; color: var(--text-secondary); }
     .game-card {
         background: #fff; border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--card-border);
         transition: transform 0.2s, box-shadow 0.2s;
@@ -101,20 +132,27 @@
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/chat">Chat</a></li>
+            <li><a href="/habit-tracker">Habit Tracker</a></li>
             <li><a href="/therapists">Therapists</a></li>
         </ul>
     </nav>
     <div class="container">
         <h1>Mind Relaxing Games</h1>
         <p class="subtitle">Take a break to calm your mind and refocus with our collection of simple, relaxing games.</p>
-        
+
+        <section class="stats-panel">
+            <h3>Your Game Stats (Saved in DB)</h3>
+            <div class="stats-status" id="statsStatus">Loading your stats...</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </section>
+
         <div class="game-grid">
             <div class="game-card">
                 <h3><i class="fas fa-wind" style="color: #0ea5e9;"></i> Bubble Pop</h3>
                 <p>Pop floating bubbles to relieve stress. Each pop is a release of tension. Click on them before they float away.</p>
                 <button class="play-btn" onclick="openGame('bubble')">Play Game</button>
             </div>
-            
+
             <div class="game-card">
                 <h3><i class="fas fa-lungs" style="color: #10b981;"></i> 4-7-8 Breathing</h3>
                 <p>A guided breathing exercise to calm your nervous system. Inhale for 4s, hold for 7s, exhale for 8s.</p>
@@ -132,7 +170,7 @@
                 <p>Connect stars to form a beautiful constellation. A slow, meditative focus exercise.</p>
                 <button class="play-btn" onclick="openGame('stars')">Play Game</button>
             </div>
-            
+
             <div class="game-card">
                 <h3><i class="fas fa-seedling" style="color: #84cc16;"></i> Grow a Plant</h3>
                 <p>Click repeatedly to nurture and grow a small digital plant. Watch it bloom with each click.</p>
@@ -141,7 +179,6 @@
         </div>
     </div>
 
-    <!-- Modal for game execution -->
     <div class="modal-overlay" id="gameModal" onclick="if(event.target===this) closeGame()">
         <div class="modal-content">
             <div class="modal-header">
@@ -157,52 +194,160 @@
     <script>
         let currentGameInterval = null;
         let animationFrame = null;
+        let activeGameType = null;
+        let activeGameStartMs = 0;
+
+        const gameRuntime = {
+            bubbleScore: 0,
+            breathingCycles: 0,
+            doodleStrokes: 0,
+            starsConnected: 0,
+            plantStage: 0,
+        };
+
+        function setStatsStatus(text) {
+            const el = document.getElementById('statsStatus');
+            if (el) el.textContent = text;
+        }
+
+        async function apiRequest(url, options) {
+            const response = await fetch(url, options || {});
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+            return data;
+        }
+
+        function renderStatsCards(rows) {
+            const statsGrid = document.getElementById('statsGrid');
+            if (!statsGrid) return;
+            const map = {};
+            (rows || []).forEach((r) => { map[r.game_key] = r; });
+            const games = [
+                { key: 'bubble', name: 'Bubble Pop' },
+                { key: 'breathing', name: '4-7-8 Breathing' },
+                { key: 'doodle', name: 'Zen Doodle' },
+                { key: 'stars', name: 'Connect the Stars' },
+                { key: 'plant', name: 'Grow a Plant' },
+            ];
+            statsGrid.innerHTML = games.map((g) => {
+                const s = map[g.key] || { best_score: 0, last_score: 0, total_plays: 0, total_seconds: 0 };
+                return '<div class="stats-card">' +
+                    '<div class="name">' + g.name + '</div>' +
+                    '<div class="meta">Best: ' + s.best_score + ' | Last: ' + s.last_score + '</div>' +
+                    '<div class="meta">Plays: ' + s.total_plays + ' | Time: ' + s.total_seconds + 's</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        async function refreshGameStats() {
+            try {
+                const data = await apiRequest('/api/games/stats');
+                renderStatsCards(data.stats || []);
+                setStatsStatus('Stats are synced from your database account.');
+            } catch (err) {
+                renderStatsCards([]);
+                setStatsStatus(err.message + '. Sign in and run latest SQL migration if needed.');
+            }
+        }
+
+        async function saveGameStat(gameKey, score, durationSeconds, metadata) {
+            try {
+                await apiRequest('/api/games/stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        game_key: gameKey,
+                        score: score,
+                        duration_seconds: durationSeconds,
+                        metadata: metadata || {},
+                    }),
+                });
+                await refreshGameStats();
+            } catch (err) {
+                setStatsStatus(err.message + '.');
+            }
+        }
+
+        function beginGame(type) {
+            activeGameType = type;
+            activeGameStartMs = Date.now();
+            gameRuntime.bubbleScore = 0;
+            gameRuntime.breathingCycles = 0;
+            gameRuntime.doodleStrokes = 0;
+            gameRuntime.starsConnected = 0;
+            gameRuntime.plantStage = 0;
+        }
+
+        async function finalizeGame() {
+            if (!activeGameType) return;
+            const durationSeconds = Math.max(0, Math.floor((Date.now() - activeGameStartMs) / 1000));
+            let score = 0;
+            if (activeGameType === 'bubble') score = gameRuntime.bubbleScore;
+            if (activeGameType === 'breathing') score = gameRuntime.breathingCycles;
+            if (activeGameType === 'doodle') score = gameRuntime.doodleStrokes;
+            if (activeGameType === 'stars') score = gameRuntime.starsConnected;
+            if (activeGameType === 'plant') score = gameRuntime.plantStage;
+
+            const gameType = activeGameType;
+            activeGameType = null;
+            await saveGameStat(gameType, score, durationSeconds, { finished_at: new Date().toISOString() });
+        }
 
         function openGame(type) {
+            beginGame(type);
             document.getElementById('gameModal').classList.add('active');
             const area = document.getElementById('gameArea');
             area.innerHTML = '';
             clearInterval(currentGameInterval);
             cancelAnimationFrame(animationFrame);
-            
+            if (window.breathTimer) {
+                clearTimeout(window.breathTimer);
+                window.breathTimer = null;
+            }
+
             if (type === 'bubble') {
                 document.getElementById('gameTitle').innerText = 'Bubble Pop';
                 area.innerHTML = '<div class="bubbleArea" id="bubbleCanvas"></div><p id="score" style="margin-top:15px; font-weight:bold;">Popped: 0</p>';
                 startBubbleGame();
             } else if (type === 'breathing') {
                 document.getElementById('gameTitle').innerText = '4-7-8 Breathing';
-                area.innerHTML = '<div class="breathing-circle" id="breathCircle">Inhale</div><p style="margin-top:20px; color:#5D6A7B;">Follow the circle to relax your body and mind.</p>';
+                area.innerHTML = '<div class="breathing-circle" id="breathCircle">Inhale</div><p id="breathCount" style="margin-top:14px; font-weight:700;">Cycles: 0</p><p style="margin-top:8px; color:#5D6A7B;">Follow the circle to relax your body and mind.</p>';
                 startBreathing();
             } else if (type === 'doodle') {
                 document.getElementById('gameTitle').innerText = 'Zen Doodle';
-                area.innerHTML = '<canvas id="colorCanvas" width="500" height="300"></canvas><div style="margin-top:10px;"><button onclick="clearCanvas()" style="padding:6px 12px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">Clear</button></div>';
+                area.innerHTML = '<canvas id="colorCanvas" width="500" height="300"></canvas><p id="doodleCount" style="margin-top:10px; font-weight:700;">Strokes: 0</p><div style="margin-top:10px;"><button onclick="clearCanvas()" style="padding:6px 12px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">Clear</button></div>';
                 startDoodle();
             } else if (type === 'stars') {
                 document.getElementById('gameTitle').innerText = 'Connect the Stars';
-                area.innerHTML = '<div class="bubbleArea" id="starCanvas" style="background:#1e293b;"></div>';
+                area.innerHTML = '<div class="bubbleArea" id="starCanvas" style="background:#1e293b;"></div><p id="starsScore" style="margin-top:12px; font-weight:700;">Connected: 0/8</p>';
                 startStars();
             } else if (type === 'plant') {
                 document.getElementById('gameTitle').innerText = 'Grow a Plant';
-                area.innerHTML = '<div><p id="plantState" style="font-size: 5rem; margin:20px 0;">\ud83c\udf31</p><button onclick="growPlant()" class="play-btn">Water Plant \ud83d\udca7</button><p id="plantMsg" style="margin-top:15px; color:#5D6A7B;">Keep watering to see it grow!</p></div>';
-                window.plantStage = 0;
+                area.innerHTML = '<div><p id="plantState" style="font-size: 5rem; margin:20px 0;">🌱</p><button onclick="growPlant()" class="play-btn">Water Plant 💧</button><p id="plantMsg" style="margin-top:15px; color:#5D6A7B;">Keep watering to see it grow!</p><p style="font-weight:700;">Growth: <span id="plantScore">0</span>/4</p></div>';
+                gameRuntime.plantStage = 0;
             }
         }
 
-        function closeGame() {
+        async function closeGame() {
+            const pendingSave = finalizeGame();
             document.getElementById('gameModal').classList.remove('active');
             clearInterval(currentGameInterval);
             cancelAnimationFrame(animationFrame);
+            if (window.breathTimer) {
+                clearTimeout(window.breathTimer);
+                window.breathTimer = null;
+            }
             document.getElementById('gameArea').innerHTML = '';
+            await pendingSave;
         }
 
-        // Bubble Game
         function startBubbleGame() {
-            let score = 0;
             const canvas = document.getElementById('bubbleCanvas');
             const scoreEl = document.getElementById('score');
-            
             currentGameInterval = setInterval(() => {
-                if(!document.getElementById('bubbleCanvas')) return clearInterval(currentGameInterval);
+                if (!document.getElementById('bubbleCanvas')) return clearInterval(currentGameInterval);
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
                 const size = Math.random() * 30 + 30;
@@ -210,62 +355,64 @@
                 bubble.style.height = size + 'px';
                 bubble.style.left = (Math.random() * 90) + '%';
                 bubble.style.bottom = '-40px';
-                let colors = ['#0ea5e9', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6'];
-                bubble.style.background = `radial-gradient(circle at 30% 30%, #fff, ${colors[Math.floor(Math.random()*colors.length)]})`;
-                
+                const colors = ['#0ea5e9', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6'];
+                bubble.style.background = `radial-gradient(circle at 30% 30%, #fff, ${colors[Math.floor(Math.random() * colors.length)]})`;
+
                 bubble.onclick = function() {
-                    score++;
-                    scoreEl.innerText = 'Popped: ' + score;
+                    gameRuntime.bubbleScore += 1;
+                    scoreEl.innerText = 'Popped: ' + gameRuntime.bubbleScore;
                     this.remove();
                 };
-                
+
                 canvas.appendChild(bubble);
-                setTimeout(() => { if(bubble.parentNode) bubble.remove(); }, 3800);
+                setTimeout(() => { if (bubble.parentNode) bubble.remove(); }, 3800);
             }, 800);
         }
 
-        // Breathing Game
         function startBreathing() {
             const circle = document.getElementById('breathCircle');
-            if(!circle) return;
-            
-            let phase = 0; // 0=inhale, 1=hold, 2=exhale
+            const count = document.getElementById('breathCount');
+            if (!circle) return;
+            let phase = 0;
             const textContent = ['Inhale (4s)', 'Hold (7s)', 'Exhale (8s)'];
             const scale = [1.5, 1.5, 1.0];
             const times = [4000, 7000, 8000];
             const colors = ['#16697A', '#0ea5e9', '#124E5A'];
-            
+
             function step() {
-                if(!document.getElementById('breathCircle')) return;
+                if (!document.getElementById('breathCircle')) return;
                 circle.innerText = textContent[phase];
-                circle.style.transition = `transform ${times[phase]/1000}s linear, background 0.5s`;
+                circle.style.transition = `transform ${times[phase] / 1000}s linear, background 0.5s`;
                 circle.style.transform = `scale(${scale[phase]})`;
                 circle.style.background = colors[phase];
-                
-                setTimeout(() => {
+
+                window.breathTimer = setTimeout(() => {
                     phase = (phase + 1) % 3;
+                    if (phase === 0) {
+                        gameRuntime.breathingCycles += 1;
+                        if (count) count.textContent = 'Cycles: ' + gameRuntime.breathingCycles;
+                    }
                     step();
                 }, times[phase]);
             }
-            // Ensure first transition kicks in by a slight delay
-            setTimeout(step, 100);
+            window.breathTimer = setTimeout(step, 100);
         }
 
-        // Doodle Game
         function startDoodle() {
             const canvas = document.getElementById('colorCanvas');
-            if(!canvas) return;
+            const count = document.getElementById('doodleCount');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let isDrawing = false;
-            let lastX = 0, lastY = 0;
+            let lastX = 0;
+            let lastY = 0;
             let hue = 0;
 
             function draw(e) {
-                if(!isDrawing) return;
+                if (!isDrawing) return;
                 e.preventDefault();
-                let x = e.offsetX || (e.touches && (e.touches[0].clientX - canvas.getBoundingClientRect().left));
-                let y = e.offsetY || (e.touches && (e.touches[0].clientY - canvas.getBoundingClientRect().top));
-                
+                const x = e.offsetX || (e.touches && (e.touches[0].clientX - canvas.getBoundingClientRect().left));
+                const y = e.offsetY || (e.touches && (e.touches[0].clientY - canvas.getBoundingClientRect().top));
                 ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
                 ctx.lineWidth = 5;
                 ctx.lineCap = 'round';
@@ -273,69 +420,71 @@
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(x, y);
                 ctx.stroke();
-                
                 [lastX, lastY] = [x, y];
-                hue++;
-                if(hue >= 360) hue = 0;
+                hue = (hue + 1) % 360;
+                gameRuntime.doodleStrokes += 1;
+                if (count) count.textContent = 'Strokes: ' + gameRuntime.doodleStrokes;
             }
 
             canvas.addEventListener('mousedown', (e) => { isDrawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; });
             canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', () => isDrawing = false);
-            canvas.addEventListener('mouseout', () => isDrawing = false);
-            
-            canvas.addEventListener('touchstart', (e) => { 
-                isDrawing = true; 
-                let rect = canvas.getBoundingClientRect();
-                lastX = e.touches[0].clientX - rect.left; 
-                lastY = e.touches[0].clientY - rect.top; 
-            }, {passive: false});
-            canvas.addEventListener('touchmove', draw, {passive: false});
-            canvas.addEventListener('touchend', () => isDrawing = false);
-        }
-        function clearCanvas() {
-            const canvas = document.getElementById('colorCanvas');
-            if(canvas) {
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
+            canvas.addEventListener('mouseup', () => { isDrawing = false; });
+            canvas.addEventListener('mouseout', () => { isDrawing = false; });
+            canvas.addEventListener('touchstart', (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                lastX = e.touches[0].clientX - rect.left;
+                lastY = e.touches[0].clientY - rect.top;
+            }, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', () => { isDrawing = false; });
         }
 
-        // Stars Game
+        function clearCanvas() {
+            const canvas = document.getElementById('colorCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
         function startStars() {
             const cvs = document.getElementById('starCanvas');
-            if(!cvs) return;
-            
-            let starsRendered = 0;
-            let coords = [];
-            for(let i=0; i<8; i++){
-                coords.push({x: Math.random()*80 + 10, y: Math.random()*80 + 10});
+            const scoreEl = document.getElementById('starsScore');
+            if (!cvs) return;
+            const coords = [];
+            for (let i = 0; i < 8; i += 1) {
+                coords.push({ x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 });
             }
-            
             let lastStar = null;
-            coords.forEach((c, idx) => {
+            gameRuntime.starsConnected = 0;
+
+            coords.forEach((c) => {
                 const s = document.createElement('div');
                 s.className = 'star';
                 s.style.left = c.x + '%';
                 s.style.top = c.y + '%';
                 s.onclick = function() {
+                    if (this.dataset.clicked === '1') return;
+                    this.dataset.clicked = '1';
                     this.style.background = '#fff';
                     this.style.boxShadow = '0 0 10px #fff';
-                    if(lastStar && lastStar !== this) {
+                    gameRuntime.starsConnected += 1;
+                    if (scoreEl) scoreEl.textContent = 'Connected: ' + gameRuntime.starsConnected + '/8';
+
+                    if (lastStar && lastStar !== this) {
                         const line = document.createElement('div');
                         line.style.position = 'absolute';
                         line.style.background = 'rgba(255,255,255,0.4)';
                         line.style.height = '2px';
                         line.style.transformOrigin = 'left center';
-                        
-                        const lx = parseFloat(lastStar.style.left)*cvs.clientWidth/100 + 6;
-                        const ly = parseFloat(lastStar.style.top)*cvs.clientHeight/100 + 6;
-                        const tx = parseFloat(this.style.left)*cvs.clientWidth/100 + 6;
-                        const ty = parseFloat(this.style.top)*cvs.clientHeight/100 + 6;
-                        
+
+                        const lx = parseFloat(lastStar.style.left) * cvs.clientWidth / 100 + 6;
+                        const ly = parseFloat(lastStar.style.top) * cvs.clientHeight / 100 + 6;
+                        const tx = parseFloat(this.style.left) * cvs.clientWidth / 100 + 6;
+                        const ty = parseFloat(this.style.top) * cvs.clientHeight / 100 + 6;
                         const angle = Math.atan2(ty - ly, tx - lx) * 180 / Math.PI;
                         const length = Math.sqrt(Math.pow(tx - lx, 2) + Math.pow(ty - ly, 2));
-                        
+
                         line.style.width = length + 'px';
                         line.style.left = lx + 'px';
                         line.style.top = ly + 'px';
@@ -348,26 +497,28 @@
             });
         }
 
-        // Plant Game
         function growPlant() {
-            const states = ['\ud83c\udf31', '\ud83c\udf3f', '\ud83c\udf40', '\ud83c\udf37', '\ud83c\udf3a'];
+            const states = ['🌱', '🌿', '🍀', '🌷', '🌺'];
             const msgs = ['A small sprout!', 'It is growing leaves!', 'Getting bigger!', 'A flower bud appears!', 'Fully bloomed! Take a deep breath.'];
-            if(window.plantStage < states.length - 1) {
-                window.plantStage++;
-                document.getElementById('plantState').innerText = states[window.plantStage];
-                document.getElementById('plantState').style.transform = `scale(${1 + window.plantStage * 0.1})`;
+            if (gameRuntime.plantStage < states.length - 1) {
+                gameRuntime.plantStage += 1;
+                document.getElementById('plantState').innerText = states[gameRuntime.plantStage];
+                document.getElementById('plantState').style.transform = `scale(${1 + gameRuntime.plantStage * 0.1})`;
                 document.getElementById('plantState').style.transition = 'transform 0.3s ease';
-                document.getElementById('plantMsg').innerText = msgs[window.plantStage];
+                document.getElementById('plantMsg').innerText = msgs[gameRuntime.plantStage];
+                const scoreEl = document.getElementById('plantScore');
+                if (scoreEl) scoreEl.textContent = String(gameRuntime.plantStage);
             } else {
                 document.getElementById('plantMsg').innerText = 'The plant is full grown! Beautiful!';
             }
         }
+
+        refreshGameStats();
     </script>
 
-    <!-- Optional translate widget integration so games page can be translated as well -->
     <script type="text/javascript">
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element_games');
+            new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element_games');
         }
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

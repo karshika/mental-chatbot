@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goal & Habit Tracking — MindCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #16697A;
+        --primary-dark: #124E5A;
+        --bg: #F5FBFF;
+        --card: #FFFFFF;
+        --text: #172033;
+        --text-secondary: #5D6A7B;
+        --border: #DFEAF0;
+        --ok: #16A34A;
+        --mid: #0EA5E9;
+        --low: #F97316;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--text);
+        background:
+            radial-gradient(circle at 10% 8%, #fff3d9 0%, rgba(255,243,217,0) 30%),
+            radial-gradient(circle at 92% 5%, #d5f6ee 0%, rgba(213,246,238,0) 35%),
+            var(--bg);
+        min-height: 100vh;
+    }
+
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 26px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        backdrop-filter: blur(10px);
+        background: rgba(245, 251, 255, 0.85);
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 800;
+        font-size: 1.08rem;
+    }
+
+    .brand i {
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), #0d9488);
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 999px;
+    }
+
+    .nav-link:hover {
+        color: var(--primary);
+        background: #eaf7fb;
+    }
+
+    .container {
+        max-width: 980px;
+        margin: 32px auto;
+        padding: 0 20px 36px;
+    }
+
+    .hero {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        margin-bottom: 20px;
+    }
+
+    .hero h1 {
+        margin: 0 0 8px;
+        font-size: 1.6rem;
+    }
+
+    .hero p {
+        margin: 0;
+        color: var(--text-secondary);
+        line-height: 1.55;
+    }
+
+    .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    }
+
+    .goal-settings {
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 14px;
+        background: #FCFEFF;
+    }
+
+    .goal-settings h3 {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+    }
+
+    .goal-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        margin-bottom: 10px;
+    }
+
+    .goal-item label {
+        display: block;
+        font-size: 0.74rem;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+
+    .goal-item input {
+        width: 100%;
+        border: 1px solid #ccdbe3;
+        border-radius: 8px;
+        padding: 7px 8px;
+        font-size: 0.85rem;
+        font-family: inherit;
+        outline: none;
+    }
+
+    .goal-item input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(22,105,122,0.14);
+    }
+
+    .habit-list {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .habit-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #FBFDFF;
+    }
+
+    .habit-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .habit-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        font-size: 0.92rem;
+    }
+
+    .habit-goal {
+        color: var(--text-secondary);
+        font-size: 0.79rem;
+        font-weight: 700;
+    }
+
+    .habit-input-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .habit-input {
+        width: 100%;
+        border: 1px solid #ccdbe3;
+        border-radius: 9px;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: var(--text);
+        outline: none;
+        background: #fff;
+    }
+
+    .habit-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(22,105,122,0.14);
+    }
+
+    .habit-unit {
+        min-width: 56px;
+        text-align: right;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .habit-meter {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: #E8EFF2;
+        overflow: hidden;
+    }
+
+    .habit-meter span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--mid);
+        transition: width 0.25s ease;
+    }
+
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+        font-weight: 800;
+        font-size: 0.95rem;
+    }
+
+    .save-status {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.86rem;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), #0d9488);
+        color: #fff;
+    }
+
+    .btn-secondary {
+        background: #fff;
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .btn:hover { opacity: 0.94; }
+
+    @media (max-width: 680px) {
+        nav { padding: 14px 16px; }
+        .container { padding: 0 14px 24px; }
+    }
+</style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand"><i class="fas fa-heart-pulse"></i> MindCare</a>
+        <div class="nav-links">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/chat">Chat</a>
+            <a class="nav-link" href="/games">Games</a>
+            <a class="nav-link" href="/music">Music</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Goal & Habit Tracking</h1>
+            <p>Track Sleep, Screen Time, Exercise, and Social Activity daily. Data is saved to your account in Supabase.</p>
+        </section>
+
+        <section class="panel">
+            <div class="goal-settings">
+                <h3>Daily Goals</h3>
+                <div class="goal-grid">
+                    <div class="goal-item">
+                        <label for="goalSleep">Sleep Goal (hours)</label>
+                        <input id="goalSleep" type="number" min="1" max="24" step="0.5" placeholder="8">
+                    </div>
+                    <div class="goal-item">
+                        <label for="goalScreen">Max Screen Time (hours)</label>
+                        <input id="goalScreen" type="number" min="0.5" max="24" step="0.5" placeholder="4">
+                    </div>
+                    <div class="goal-item">
+                        <label for="goalExercise">Exercise Goal (minutes)</label>
+                        <input id="goalExercise" type="number" min="5" max="600" step="5" placeholder="30">
+                    </div>
+                    <div class="goal-item">
+                        <label for="goalSocial">Social Goal (minutes)</label>
+                        <input id="goalSocial" type="number" min="5" max="600" step="5" placeholder="30">
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="saveGoals()">Save Goals</button>
+            </div>
+
+            <div class="habit-list">
+                <div class="habit-item">
+                    <div class="habit-row">
+                        <div class="habit-label"><i class="fas fa-bed"></i> Sleep</div>
+                        <div class="habit-goal" id="sleepGoalLabel">Goal: 8 h</div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input id="habitSleep" class="habit-input" type="number" min="0" max="24" step="0.5" placeholder="0" oninput="updateHabitTracker()">
+                        <span class="habit-unit">hours</span>
+                    </div>
+                    <div class="habit-meter"><span id="habitSleepBar"></span></div>
+                </div>
+
+                <div class="habit-item">
+                    <div class="habit-row">
+                        <div class="habit-label"><i class="fas fa-mobile-screen-button"></i> Screen Time</div>
+                        <div class="habit-goal" id="screenGoalLabel">Target: <= 4 h</div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input id="habitScreen" class="habit-input" type="number" min="0" max="24" step="0.5" placeholder="0" oninput="updateHabitTracker()">
+                        <span class="habit-unit">hours</span>
+                    </div>
+                    <div class="habit-meter"><span id="habitScreenBar"></span></div>
+                </div>
+
+                <div class="habit-item">
+                    <div class="habit-row">
+                        <div class="habit-label"><i class="fas fa-dumbbell"></i> Exercise</div>
+                        <div class="habit-goal" id="exerciseGoalLabel">Goal: 30 min</div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input id="habitExercise" class="habit-input" type="number" min="0" max="300" step="5" placeholder="0" oninput="updateHabitTracker()">
+                        <span class="habit-unit">mins</span>
+                    </div>
+                    <div class="habit-meter"><span id="habitExerciseBar"></span></div>
+                </div>
+
+                <div class="habit-item">
+                    <div class="habit-row">
+                        <div class="habit-label"><i class="fas fa-user-group"></i> Social Activity</div>
+                        <div class="habit-goal" id="socialGoalLabel">Goal: 30 min</div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input id="habitSocial" class="habit-input" type="number" min="0" max="600" step="5" placeholder="0" oninput="updateHabitTracker()">
+                        <span class="habit-unit">mins</span>
+                    </div>
+                    <div class="habit-meter"><span id="habitSocialBar"></span></div>
+                </div>
+            </div>
+
+            <div class="summary">
+                <div id="habitScore">Daily Score: 0%</div>
+                <div id="habitStreak">Streak: 0 days</div>
+            </div>
+            <div class="save-status" id="habitSaveStatus">No data saved for today yet.</div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveHabitTracker()">Save Today</button>
+                <button class="btn btn-secondary" onclick="resetHabitTracker()">Reset</button>
+            </div>
+        </section>
+    </main>
+
+<script>
+    const HABIT_GOALS = { sleep: 8, screen: 4, exercise: 30, social: 30 };
+
+    function setStatus(text) {
+        const status = document.getElementById('habitSaveStatus');
+        if (status) status.textContent = text;
+    }
+
+    async function apiRequest(url, options) {
+        const response = await fetch(url, options || {});
+        const data = await response.json().catch(function() { return {}; });
+        if (!response.ok) {
+            const msg = data.error || 'Request failed.';
+            throw new Error(msg);
+        }
+        return data;
+    }
+
+    function parseHabitValue(id) {
+        const el = document.getElementById(id);
+        if (!el) return 0;
+        const value = parseFloat(el.value);
+        return Number.isFinite(value) ? Math.max(0, value) : 0;
+    }
+
+    function getHabitValues() {
+        return {
+            sleep: parseHabitValue('habitSleep'),
+            screen: parseHabitValue('habitScreen'),
+            exercise: parseHabitValue('habitExercise'),
+            social: parseHabitValue('habitSocial'),
+        };
+    }
+
+    function updateGoalLabels() {
+        const sleepLabel = document.getElementById('sleepGoalLabel');
+        const screenLabel = document.getElementById('screenGoalLabel');
+        const exerciseLabel = document.getElementById('exerciseGoalLabel');
+        const socialLabel = document.getElementById('socialGoalLabel');
+        if (sleepLabel) sleepLabel.textContent = 'Goal: ' + HABIT_GOALS.sleep + ' h';
+        if (screenLabel) screenLabel.textContent = 'Target: <= ' + HABIT_GOALS.screen + ' h';
+        if (exerciseLabel) exerciseLabel.textContent = 'Goal: ' + HABIT_GOALS.exercise + ' min';
+        if (socialLabel) socialLabel.textContent = 'Goal: ' + HABIT_GOALS.social + ' min';
+    }
+
+    function populateGoalInputs() {
+        const goalSleep = document.getElementById('goalSleep');
+        const goalScreen = document.getElementById('goalScreen');
+        const goalExercise = document.getElementById('goalExercise');
+        const goalSocial = document.getElementById('goalSocial');
+        if (goalSleep) goalSleep.value = HABIT_GOALS.sleep;
+        if (goalScreen) goalScreen.value = HABIT_GOALS.screen;
+        if (goalExercise) goalExercise.value = HABIT_GOALS.exercise;
+        if (goalSocial) goalSocial.value = HABIT_GOALS.social;
+    }
+
+    function getGoalInputValues() {
+        const sleep = parseFloat((document.getElementById('goalSleep') || {}).value);
+        const screen = parseFloat((document.getElementById('goalScreen') || {}).value);
+        const exercise = parseInt((document.getElementById('goalExercise') || {}).value, 10);
+        const social = parseInt((document.getElementById('goalSocial') || {}).value, 10);
+        return {
+            sleep_hours_goal: Number.isFinite(sleep) ? sleep : HABIT_GOALS.sleep,
+            max_screen_hours_goal: Number.isFinite(screen) ? screen : HABIT_GOALS.screen,
+            exercise_minutes_goal: Number.isFinite(exercise) ? exercise : HABIT_GOALS.exercise,
+            social_minutes_goal: Number.isFinite(social) ? social : HABIT_GOALS.social,
+        };
+    }
+
+    function computeHabitScores(values) {
+        const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(values.sleep, HABIT_GOALS.sleep) / HABIT_GOALS.sleep) * 100)));
+        const screenScore = values.screen <= HABIT_GOALS.screen
+            ? 100
+            : Math.max(0, Math.round(100 - (values.screen - HABIT_GOALS.screen) * 20));
+        const exerciseScore = Math.max(0, Math.min(100, Math.round((Math.min(values.exercise, HABIT_GOALS.exercise) / HABIT_GOALS.exercise) * 100)));
+        const socialScore = Math.max(0, Math.min(100, Math.round((Math.min(values.social, HABIT_GOALS.social) / HABIT_GOALS.social) * 100)));
+        const total = Math.round((sleepScore + screenScore + exerciseScore + socialScore) / 4);
+        return { sleep: sleepScore, screen: screenScore, exercise: exerciseScore, social: socialScore, total: total };
+    }
+
+    function applyHabitMeter(barId, pct) {
+        const bar = document.getElementById(barId);
+        if (!bar) return;
+        bar.style.width = String(Math.max(0, Math.min(100, pct))) + '%';
+        if (pct >= 80) {
+            bar.style.backgroundColor = '#16A34A';
+        } else if (pct >= 50) {
+            bar.style.backgroundColor = '#0EA5E9';
+        } else {
+            bar.style.backgroundColor = '#F97316';
+        }
+    }
+
+    function updateHabitTracker(streakValue) {
+        const values = getHabitValues();
+        const scores = computeHabitScores(values);
+        applyHabitMeter('habitSleepBar', scores.sleep);
+        applyHabitMeter('habitScreenBar', scores.screen);
+        applyHabitMeter('habitExerciseBar', scores.exercise);
+        applyHabitMeter('habitSocialBar', scores.social);
+
+        const scoreEl = document.getElementById('habitScore');
+        if (scoreEl) scoreEl.textContent = 'Daily Score: ' + scores.total + '%';
+        const streakEl = document.getElementById('habitStreak');
+        const streak = Number.isFinite(streakValue) ? streakValue : null;
+        if (streakEl && streak !== null) {
+            streakEl.textContent = 'Streak: ' + streak + ' day' + (streak === 1 ? '' : 's');
+        }
+    }
+
+    async function saveGoals() {
+        try {
+            const payload = getGoalInputValues();
+            const data = await apiRequest('/api/habits/goals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            HABIT_GOALS.sleep = data.goals.sleep_hours_goal;
+            HABIT_GOALS.screen = data.goals.max_screen_hours_goal;
+            HABIT_GOALS.exercise = data.goals.exercise_minutes_goal;
+            HABIT_GOALS.social = data.goals.social_minutes_goal;
+            updateGoalLabels();
+            populateGoalInputs();
+            updateHabitTracker();
+            setStatus('Goals saved to database.');
+        } catch (err) {
+            setStatus(err.message);
+        }
+    }
+
+    async function saveHabitTracker() {
+        const values = getHabitValues();
+        try {
+            const data = await apiRequest('/api/habits/today', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sleep_hours: values.sleep,
+                    screen_hours: values.screen,
+                    exercise_minutes: values.exercise,
+                    social_minutes: values.social,
+                }),
+            });
+            updateHabitTracker(data.streak);
+            const stamp = new Date(data.today.updated_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            setStatus('Saved for today at ' + stamp + '.');
+        } catch (err) {
+            setStatus(err.message);
+        }
+    }
+
+    async function resetHabitTracker() {
+        ['habitSleep', 'habitScreen', 'habitExercise', 'habitSocial'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        try {
+            const data = await apiRequest('/api/habits/today', { method: 'DELETE' });
+            updateHabitTracker(data.streak);
+            setStatus('No data saved for today yet.');
+        } catch (err) {
+            setStatus(err.message);
+        }
+    }
+
+    async function loadHabitTracker() {
+        try {
+            const data = await apiRequest('/api/habits/bootstrap');
+            HABIT_GOALS.sleep = data.goals.sleep_hours_goal;
+            HABIT_GOALS.screen = data.goals.max_screen_hours_goal;
+            HABIT_GOALS.exercise = data.goals.exercise_minutes_goal;
+            HABIT_GOALS.social = data.goals.social_minutes_goal;
+            updateGoalLabels();
+            populateGoalInputs();
+
+            if (data.today) {
+                const sleep = document.getElementById('habitSleep');
+                const screen = document.getElementById('habitScreen');
+                const exercise = document.getElementById('habitExercise');
+                const social = document.getElementById('habitSocial');
+                if (sleep) sleep.value = data.today.sleep_hours ?? '';
+                if (screen) screen.value = data.today.screen_hours ?? '';
+                if (exercise) exercise.value = data.today.exercise_minutes ?? '';
+                if (social) social.value = data.today.social_minutes ?? '';
+                const stamp = data.today.updated_at
+                    ? new Date(data.today.updated_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                    : 'now';
+                setStatus('Saved for today at ' + stamp + '.');
+            } else {
+                setStatus('No data saved for today yet.');
+            }
+
+            updateHabitTracker(data.streak);
+        } catch (err) {
+            setStatus(err.message + ' Sign in again or run latest SQL migration.');
+        }
+    }
+
+    loadHabitTracker();
+</script>
+</body>
+</html>

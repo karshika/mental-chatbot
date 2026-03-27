@@ -4,24 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCare — Your Mental Health Companion</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6C63FF;
-            --primary-dark: #5A52D5;
-            --primary-light: #E8E6FF;
-            --accent: #00C9A7;
-            --accent-light: #E0FFF8;
-            --bg-main: #F4F6FB;
-            --bg-chat: #FAFBFE;
-            --bg-sidebar: #ffffff;
-            --text-primary: #1E1E2D;
-            --text-secondary: #6B7280;
-            --text-muted: #9CA3AF;
-            --border: #E5E7EB;
-            --border-light: #F0F1F5;
-            --user-bubble: linear-gradient(135deg, #6C63FF 0%, #896BFF 100%);
+            --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Fraunces', Georgia, serif;
+            --primary: #19738C;
+            --primary-dark: #155F74;
+            --primary-light: #DDF3FA;
+            --accent: #37A689;
+            --accent-light: #DFF8F0;
+            --bg-main: #ECF4F5;
+            --bg-chat: #F7FCFB;
+            --bg-sidebar: #FDFEFE;
+            --text-primary: #1C2A31;
+            --text-secondary: #4B5F68;
+            --text-muted: #748891;
+            --border: #D5E3E7;
+            --border-light: #E8EFF2;
+            --user-bubble: linear-gradient(145deg, #19738C 0%, #225F96 100%);
             --bot-bubble: #FFFFFF;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
@@ -36,22 +38,70 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-main);
+            font-family: var(--font-sans);
+            background:
+                radial-gradient(1200px 700px at -10% 120%, rgba(55,166,137,0.14), transparent 55%),
+                radial-gradient(1000px 600px at 110% -5%, rgba(25,115,140,0.14), transparent 52%),
+                linear-gradient(160deg, #E9F2F3 0%, #F6FBFB 45%, #ECF5F6 100%);
             height: 100vh;
             display: flex;
             overflow: hidden;
             color: var(--text-primary);
+            position: relative;
+        }
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0.65;
+            animation: drift 20s ease-in-out infinite;
+        }
+        .ambient-orb.orb-1 {
+            width: 280px;
+            height: 280px;
+            left: -60px;
+            top: 8%;
+            background: radial-gradient(circle at 30% 30%, rgba(109, 209, 184, 0.45), rgba(109, 209, 184, 0.05));
+        }
+        .ambient-orb.orb-2 {
+            width: 360px;
+            height: 360px;
+            right: -120px;
+            top: 18%;
+            background: radial-gradient(circle at 40% 40%, rgba(113, 173, 199, 0.45), rgba(113, 173, 199, 0.06));
+            animation-delay: -6s;
+        }
+        .ambient-orb.orb-3 {
+            width: 240px;
+            height: 240px;
+            left: 30%;
+            bottom: -120px;
+            background: radial-gradient(circle at 55% 30%, rgba(120, 188, 161, 0.35), rgba(120, 188, 161, 0.06));
+            animation-delay: -12s;
+        }
+        @keyframes drift {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-12px) translateX(8px); }
+            50% { transform: translateY(10px) translateX(-10px); }
+            75% { transform: translateY(-8px) translateX(6px); }
         }
         .sidebar {
             width: 300px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-light);
+            background: rgba(255,255,255,0.84);
+            border-right: 1px solid rgba(213,227,231,0.7);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
             z-index: 10;
             transition: var(--transition);
+            backdrop-filter: blur(10px);
         }
         .sidebar-header {
             padding: 24px 20px 16px;
@@ -71,7 +121,7 @@
             color: white; font-size: 1.3rem;
             box-shadow: 0 4px 12px rgba(108,99,255,0.3);
         }
-        .brand-text h2 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+        .brand-text h2 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; font-family: var(--font-display); }
         .brand-text span { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
         .new-chat-btn {
             display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -171,9 +221,23 @@
             text-decoration: none;
         }
         .signout-btn:hover { background: var(--danger-light); color: var(--danger); border-color: #FECACA; }
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            position: relative;
+            z-index: 2;
+            margin: 10px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(213,227,231,0.8);
+            box-shadow: 0 12px 35px rgba(27, 58, 72, 0.08);
+            background: rgba(255,255,255,0.74);
+            backdrop-filter: blur(8px);
+        }
         .chat-header {
-            padding: 16px 28px; background: var(--bg-sidebar);
+            padding: 16px 28px; background: rgba(255,255,255,0.9);
             border-bottom: 1px solid var(--border-light);
             display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
         }
@@ -202,20 +266,43 @@
         .header-action-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-light); }
         #chatbox {
             flex: 1; overflow-y: auto; padding: 28px 32px;
-            display: flex; flex-direction: column; gap: 8px; background: var(--bg-chat);
+            display: flex; flex-direction: column; gap: 8px;
+            background:
+                radial-gradient(900px 420px at 100% 0%, rgba(55,166,137,0.08), transparent 55%),
+                radial-gradient(700px 340px at 0% 100%, rgba(25,115,140,0.08), transparent 58%),
+                var(--bg-chat);
         }
-        .welcome-card { align-self: center; text-align: center; padding: 36px 48px; margin-bottom: 16px; animation: fadeUp 0.5s ease; }
+        .welcome-card {
+            align-self: center;
+            text-align: center;
+            padding: 36px 48px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.5s ease;
+            background: rgba(255,255,255,0.86);
+            border: 1px solid rgba(213,227,231,0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 26px rgba(30, 68, 82, 0.08);
+            backdrop-filter: blur(5px);
+        }
         .welcome-card .welcome-emoji { font-size: 2.8rem; margin-bottom: 14px; display: block; }
         .welcome-card h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
         .welcome-card p { font-size: 0.88rem; color: var(--text-secondary); max-width: 380px; line-height: 1.6; }
         .suggestion-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
         .chip {
-            padding: 9px 18px; background: white; border: 1.5px solid var(--border);
+            padding: 9px 18px;
+            background: rgba(255,255,255,0.92);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 500;
             color: var(--text-secondary); cursor: pointer; transition: var(--transition);
             font-family: inherit; white-space: nowrap;
         }
-        .chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-1px); }
+        .chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(25,115,140,0.12);
+        }
         .message { display: flex; align-items: flex-end; gap: 10px; max-width: 72%; animation: fadeUp 0.35s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .user { align-self: flex-end; flex-direction: row-reverse; }
@@ -231,11 +318,11 @@
         .bubble { padding: 14px 18px; font-size: 0.9rem; line-height: 1.65; word-break: break-word; white-space: pre-wrap; }
         .bot .bubble {
             background: var(--bot-bubble); color: var(--text-primary);
-            border-radius: 4px 18px 18px 18px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+            border-radius: 4px 18px 18px 18px; border: 1px solid var(--border-light); box-shadow: 0 8px 20px rgba(24, 61, 76, 0.07);
         }
         .user .bubble {
             background: var(--user-bubble); color: white;
-            border-radius: 18px 4px 18px 18px; box-shadow: 0 4px 14px rgba(108,99,255,0.2);
+            border-radius: 18px 4px 18px 18px; box-shadow: 0 8px 18px rgba(28, 87, 121, 0.24);
         }
         .timestamp { font-size: 0.66rem; margin-top: 5px; color: var(--text-muted); font-weight: 500; padding: 0 4px; }
         .user .timestamp { text-align: right; }
@@ -252,13 +339,14 @@
             background: linear-gradient(135deg, #FFF5F5, #FFF0F0) !important;
             color: #7C2D12 !important; border: 1px solid #FECACA !important; border-left: 4px solid #EF4444 !important;
         }
-        .input-area { padding: 18px 28px 22px; background: var(--bg-sidebar); border-top: 1px solid var(--border-light); flex-shrink: 0; }
+        .input-area { padding: 18px 28px 22px; background: rgba(255,255,255,0.9); border-top: 1px solid var(--border-light); flex-shrink: 0; }
         .input-container {
             display: flex; align-items: center; gap: 10px;
-            background: var(--bg-main); border: 1.5px solid var(--border);
+            background: rgba(250,253,253,0.95); border: 1.5px solid var(--border);
             border-radius: 16px; padding: 6px 6px 6px 20px; transition: var(--transition);
+            box-shadow: 0 8px 22px rgba(25, 75, 94, 0.06);
         }
-        .input-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,99,255,0.1); background: white; }
+        .input-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(25,115,140,0.14); background: white; }
         #user-input {
             flex: 1; background: transparent; border: none; outline: none;
             padding: 12px 0; font-size: 0.92rem; color: var(--text-primary);
@@ -277,14 +365,47 @@
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
         .send-btn {
             width: 44px; height: 44px; border: none;
-            background: linear-gradient(135deg, var(--primary), #896BFF);
+            background: linear-gradient(135deg, var(--primary), #1E6E99);
             color: white; font-size: 1rem; cursor: pointer; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            transition: var(--transition); box-shadow: 0 2px 8px rgba(108,99,255,0.25);
+            transition: var(--transition); box-shadow: 0 2px 8px rgba(25,115,140,0.28);
         }
-        .send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.35); }
+        .send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(25,115,140,0.35); }
         .send-btn:active { transform: scale(0.96); }
         .input-hint { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
+        .mic-status {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--primary-dark);
+            margin-top: 6px;
+            font-weight: 600;
+            min-height: 18px;
+        }
+        .listening-indicator {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            color: #B91C1C;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+        .listening-indicator.show { display: flex; }
+        .listening-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #EF4444;
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0.6);
+            animation: micPulse 1.2s infinite;
+        }
+        @keyframes micPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
         #chatbox::-webkit-scrollbar { width: 5px; }
         #chatbox::-webkit-scrollbar-track { background: transparent; }
         #chatbox::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
@@ -305,6 +426,15 @@
             .welcome-card { padding: 24px 20px; }
             .suggestion-chips { gap: 6px; }
             .chip { padding: 7px 14px; font-size: 0.78rem; }
+            .main { margin: 0; border-radius: 0; border: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
         }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
         .sidebar-overlay.show { display: block; }
@@ -438,6 +568,127 @@
             justify-content: space-between;
         }
         .game-stat { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
+        .habit-list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .habit-item {
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 10px;
+            background: #FAFCFD;
+        }
+        .habit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .habit-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .habit-goal {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .habit-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .habit-input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 8px;
+            font-size: 0.8rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+            background: #fff;
+        }
+        .habit-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(25, 115, 140, 0.15);
+        }
+        .habit-unit {
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            min-width: 44px;
+            text-align: right;
+            font-weight: 600;
+        }
+        .habit-meter {
+            width: 100%;
+            height: 7px;
+            border-radius: 999px;
+            background: #E8EFF2;
+            overflow: hidden;
+        }
+        .habit-meter span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: #0EA5E9;
+            transition: width 0.25s ease, background-color 0.25s ease;
+        }
+        .habit-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .habit-score,
+        .habit-streak {
+            font-size: 0.79rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .habit-save-status {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .grounding-list {
+            list-style: none;
+            display: grid;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .grounding-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .grounding-item input { accent-color: var(--primary); }
+        .grounding-progress {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .prompt-box {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: #F7FAFC;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            min-height: 58px;
+        }
         .zen-board {
             width: 100%;
             height: 180px;
@@ -562,6 +813,11 @@
     </style>
 </head>
 <body>
+    <div class="ambient-bg" aria-hidden="true">
+        <span class="ambient-orb orb-1"></span>
+        <span class="ambient-orb orb-2"></span>
+        <span class="ambient-orb orb-3"></span>
+    </div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="confirm-overlay" id="confirmOverlay">
         <div class="confirm-dialog">
@@ -593,6 +849,8 @@
                 <i class="fas fa-chevron-down"></i>
             </button>
             <ul class="resources-list" id="resourcesList">
+                <li><button onclick="window.location.href='/habit-tracker'"><i class="fas fa-list-check" style="color:#0EA5E9"></i> Goal & Habit Tracking</button></li>
+                <li><button onclick="window.location.href='/games'"><i class="fas fa-seedling" style="color:#0F766E"></i> Guided Activities & Coping Tools</button></li>
                 <li><button onclick="openRecommendation('youtube')"><i class="fab fa-youtube" style="color:#FF0000"></i> Calming Videos</button></li>
                 <li><button onclick="openRecommendation('motivation')"><i class="fas fa-quote-left" style="color:#F59E0B"></i> Motivational Quotes</button></li>
                 <li><button onclick="openRecommendation('yoga')"><i class="fas fa-spa" style="color:#10B981"></i> Yoga & Meditation</button></li>
@@ -636,7 +894,6 @@
             <div class="input-container">
                 <input type="text" id="user-input" placeholder="Share what's on your mind..." autocomplete="off" />
                 <div class="input-actions">
-                    <button class="action-btn" onclick="startListening()" id="micBtn" title="Voice input"><i class="fas fa-microphone"></i></button>
                     <button class="send-btn" onclick="sendMessage()" title="Send"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -696,6 +953,23 @@
         let memoryMoves = 0;
         let memoryMatches = 0;
         let zenCount = 0;
+        let recognitionRef = null;
+        let isListening = false;
+        let listeningRequested = false;
+        let finalizingVoiceInput = false;
+        let recognitionRestartTimer = null;
+        let silenceTimer = null;
+        let accumulatedTranscript = '';
+        const SILENCE_TIMEOUT = 3000;
+        const HABIT_GOALS = { sleep: 8, screen: 4, exercise: 30, social: 30 };
+        const HABIT_STORAGE_KEY = 'mindcare_habit_history_v1';
+        const journalPrompts = [
+            'What is one feeling I have been carrying today, and what might it need from me?',
+            'What helped me cope recently, even in a small way?',
+            'If I spoke to myself like a close friend, what would I say right now?',
+            'What is one boundary that could protect my energy this week?',
+            'What is one small step I can take today to feel 1% better?'
+        ];
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -711,15 +985,53 @@
         }
         function openGamesPanel() {
             closeSidebar();
-            document.getElementById('gamesDrawer').classList.add('open');
-            document.getElementById('gamesOverlay').classList.add('show');
+            const drawer = document.getElementById('gamesDrawer');
+            const overlay = document.getElementById('gamesOverlay');
+            if (drawer) drawer.classList.add('open');
+            if (overlay) overlay.classList.add('show');
+        }
+        function openHabitTracker() {
+            openGamesPanel();
+            const card = document.getElementById('habitTrackerCard');
+            if (card) {
+                setTimeout(function() {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 120);
+            }
         }
         function closeGamesPanel() {
-            document.getElementById('gamesDrawer').classList.remove('open');
-            document.getElementById('gamesOverlay').classList.remove('show');
+            const drawer = document.getElementById('gamesDrawer');
+            const overlay = document.getElementById('gamesOverlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.classList.remove('show');
         }
         function toggleA11yPanel() {
             document.getElementById('a11yPanel').classList.toggle('show');
+        }
+        function setMicStatus(text) {
+            const el = document.getElementById('micStatus');
+            if (el) el.textContent = text;
+        }
+        function setListeningUI(enabled) {
+            isListening = enabled;
+            const micBtn = document.getElementById('micBtn');
+            const indicator = document.getElementById('listeningIndicator');
+            if (micBtn) {
+                micBtn.classList.toggle('listening', enabled);
+                micBtn.title = enabled ? 'Stop listening' : 'Speak to MindCare';
+                micBtn.innerHTML = enabled
+                    ? '<i class="fas fa-stop"></i>'
+                    : '<i class="fas fa-microphone"></i>';
+            }
+            if (indicator) {
+                indicator.classList.toggle('show', enabled);
+            }
+        }
+        function clearRecognitionRestartTimer() {
+            if (recognitionRestartTimer) {
+                clearTimeout(recognitionRestartTimer);
+                recognitionRestartTimer = null;
+            }
         }
         let fontSizePercent = 100;
         function applyFontSize() {
@@ -766,6 +1078,7 @@
             stopBreathingGame();
             const bubble = document.getElementById('breathBubble');
             const label = document.getElementById('breathLabel');
+            if (!bubble || !label) return;
             const steps = [
                 { text: 'Inhale gently for 4 seconds', scale: 1.55, duration: 4000 },
                 { text: 'Hold for 4 seconds', scale: 1.55, duration: 4000 },
@@ -788,6 +1101,7 @@
             breathStep = 0;
             const bubble = document.getElementById('breathBubble');
             const label = document.getElementById('breathLabel');
+            if (!bubble || !label) return;
             bubble.style.transitionDuration = '0.5s';
             bubble.style.transform = 'scale(1)';
             label.textContent = 'Press start to begin a calm cycle.';
@@ -807,6 +1121,8 @@
         }
         function renderMemoryGrid() {
             const grid = document.getElementById('memoryGrid');
+            const stats = document.getElementById('memoryStats');
+            if (!grid || !stats) return;
             grid.innerHTML = memoryDeck.map((card) => {
                 const classes = ['memory-card'];
                 if (card.revealed) classes.push('revealed');
@@ -815,7 +1131,7 @@
                 return '<button class="' + classes.join(' ') + '" onclick="flipMemoryCard(' + card.id + ')" ' +
                     (card.revealed || card.matched ? 'disabled' : '') + '>' + face + '</button>';
             }).join('');
-            document.getElementById('memoryStats').textContent = 'Moves: ' + memoryMoves + ' | Pairs: ' + memoryMatches + '/8';
+            stats.textContent = 'Moves: ' + memoryMoves + ' | Pairs: ' + memoryMatches + '/8';
         }
         function flipMemoryCard(cardId) {
             if (memoryOpen.length >= 2) return;
@@ -848,6 +1164,8 @@
         }
         function spawnRipple(event) {
             const board = document.getElementById('zenBoard');
+            const stats = document.getElementById('zenStats');
+            if (!board || !stats) return;
             const rect = board.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
@@ -857,7 +1175,7 @@
             ripple.style.top = y + 'px';
             board.appendChild(ripple);
             zenCount += 1;
-            document.getElementById('zenStats').textContent = 'Calm Streak: ' + zenCount;
+            stats.textContent = 'Calm Streak: ' + zenCount;
             setTimeout(() => ripple.remove(), 1300);
             if (zenCount === 30) {
                 setTimeout(() => { alert('Beautiful focus. You reached a calm streak of 30.'); }, 100);
@@ -865,8 +1183,198 @@
         }
         function resetZenGarden() {
             zenCount = 0;
-            document.getElementById('zenStats').textContent = 'Calm Streak: 0';
+            const stats = document.getElementById('zenStats');
+            if (stats) stats.textContent = 'Calm Streak: 0';
             document.querySelectorAll('.zen-ripple').forEach((r) => r.remove());
+        }
+        function updateGroundingProgress() {
+            const checks = document.querySelectorAll('#groundingList input[type="checkbox"]');
+            const done = Array.from(checks).filter((c) => c.checked).length;
+            const progress = document.getElementById('groundingProgress');
+            if (progress) progress.textContent = 'Progress: ' + done + '/5';
+            if (done === 5) {
+                setTimeout(() => {
+                    alert('Grounding complete. You did something kind for your mind.');
+                }, 100);
+            }
+        }
+        function resetGrounding() {
+            document.querySelectorAll('#groundingList input[type="checkbox"]').forEach((c) => {
+                c.checked = false;
+            });
+            const progress = document.getElementById('groundingProgress');
+            if (progress) progress.textContent = 'Progress: 0/5';
+        }
+        function generatePrompt() {
+            const pick = journalPrompts[Math.floor(Math.random() * journalPrompts.length)];
+            const box = document.getElementById('promptBox');
+            if (box) box.textContent = pick;
+        }
+        function usePromptInChat() {
+            const box = document.getElementById('promptBox');
+            const input = document.getElementById('user-input');
+            if (!box || !input) return;
+            if (box.textContent.indexOf('Press "New Prompt"') === 0) {
+                generatePrompt();
+            }
+            input.value = 'Journal prompt: ' + box.textContent + '\nMy reflection:';
+            closeGamesPanel();
+            input.focus();
+        }
+        function getHabitHistory() {
+            try {
+                const raw = localStorage.getItem(HABIT_STORAGE_KEY);
+                const parsed = raw ? JSON.parse(raw) : {};
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (e) {
+                return {};
+            }
+        }
+        function setHabitHistory(history) {
+            localStorage.setItem(HABIT_STORAGE_KEY, JSON.stringify(history));
+        }
+        function getDateKeyDaysAgo(daysAgo) {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() - daysAgo);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        }
+        function getTodayHabitKey() {
+            return getDateKeyDaysAgo(0);
+        }
+        function parseHabitValue(id) {
+            const el = document.getElementById(id);
+            if (!el) return 0;
+            const value = parseFloat(el.value);
+            return Number.isFinite(value) ? Math.max(0, value) : 0;
+        }
+        function getHabitValues() {
+            return {
+                sleep: parseHabitValue('habitSleep'),
+                screen: parseHabitValue('habitScreen'),
+                exercise: parseHabitValue('habitExercise'),
+                social: parseHabitValue('habitSocial'),
+            };
+        }
+        function computeHabitScores(values) {
+            const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(values.sleep, HABIT_GOALS.sleep) / HABIT_GOALS.sleep) * 100)));
+            const screenScore = values.screen <= HABIT_GOALS.screen
+                ? 100
+                : Math.max(0, Math.round(100 - (values.screen - HABIT_GOALS.screen) * 20));
+            const exerciseScore = Math.max(0, Math.min(100, Math.round((Math.min(values.exercise, HABIT_GOALS.exercise) / HABIT_GOALS.exercise) * 100)));
+            const socialScore = Math.max(0, Math.min(100, Math.round((Math.min(values.social, HABIT_GOALS.social) / HABIT_GOALS.social) * 100)));
+            const total = Math.round((sleepScore + screenScore + exerciseScore + socialScore) / 4);
+            return {
+                sleep: sleepScore,
+                screen: screenScore,
+                exercise: exerciseScore,
+                social: socialScore,
+                total: total,
+            };
+        }
+        function applyHabitMeter(barId, pct) {
+            const bar = document.getElementById(barId);
+            if (!bar) return;
+            bar.style.width = String(Math.max(0, Math.min(100, pct))) + '%';
+            if (pct >= 80) {
+                bar.style.backgroundColor = '#16A34A';
+            } else if (pct >= 50) {
+                bar.style.backgroundColor = '#0EA5E9';
+            } else {
+                bar.style.backgroundColor = '#F97316';
+            }
+        }
+        function calculateHabitStreak(history) {
+            const todayKey = getTodayHabitKey();
+            const hasToday = history[todayKey] && typeof history[todayKey].score === 'number';
+            const startOffset = hasToday ? 0 : 1;
+            let streak = 0;
+            for (let i = startOffset; i < 366; i += 1) {
+                const key = getDateKeyDaysAgo(i);
+                const item = history[key];
+                if (item && typeof item.score === 'number' && item.score >= 70) {
+                    streak += 1;
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        }
+        function updateHabitTracker() {
+            const values = getHabitValues();
+            const scores = computeHabitScores(values);
+            applyHabitMeter('habitSleepBar', scores.sleep);
+            applyHabitMeter('habitScreenBar', scores.screen);
+            applyHabitMeter('habitExerciseBar', scores.exercise);
+            applyHabitMeter('habitSocialBar', scores.social);
+            const scoreEl = document.getElementById('habitScore');
+            if (scoreEl) scoreEl.textContent = 'Daily Score: ' + scores.total + '%';
+            const history = getHabitHistory();
+            const streak = calculateHabitStreak(history);
+            const streakEl = document.getElementById('habitStreak');
+            if (streakEl) streakEl.textContent = 'Streak: ' + streak + ' day' + (streak === 1 ? '' : 's');
+        }
+        function saveHabitTracker() {
+            const values = getHabitValues();
+            const scores = computeHabitScores(values);
+            const history = getHabitHistory();
+            const todayKey = getTodayHabitKey();
+            history[todayKey] = {
+                sleep: values.sleep,
+                screen: values.screen,
+                exercise: values.exercise,
+                social: values.social,
+                score: scores.total,
+                saved_at: new Date().toISOString(),
+            };
+            setHabitHistory(history);
+            updateHabitTracker();
+            const status = document.getElementById('habitSaveStatus');
+            if (status) {
+                const stamp = new Date(history[todayKey].saved_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                status.textContent = 'Saved for today at ' + stamp + '.';
+            }
+        }
+        function resetHabitTracker() {
+            const ids = ['habitSleep', 'habitScreen', 'habitExercise', 'habitSocial'];
+            ids.forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const history = getHabitHistory();
+            delete history[getTodayHabitKey()];
+            setHabitHistory(history);
+            updateHabitTracker();
+            const status = document.getElementById('habitSaveStatus');
+            if (status) status.textContent = 'No data saved for today yet.';
+        }
+        function loadHabitTracker() {
+            const history = getHabitHistory();
+            const today = history[getTodayHabitKey()];
+            if (today) {
+                const sleep = document.getElementById('habitSleep');
+                const screen = document.getElementById('habitScreen');
+                const exercise = document.getElementById('habitExercise');
+                const social = document.getElementById('habitSocial');
+                if (sleep) sleep.value = today.sleep || '';
+                if (screen) screen.value = today.screen || '';
+                if (exercise) exercise.value = today.exercise || '';
+                if (social) social.value = today.social || '';
+                const status = document.getElementById('habitSaveStatus');
+                if (status) {
+                    const stamp = today.saved_at
+                        ? new Date(today.saved_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                        : 'now';
+                    status.textContent = 'Saved for today at ' + stamp + '.';
+                }
+            } else {
+                const status = document.getElementById('habitSaveStatus');
+                if (status) status.textContent = 'No data saved for today yet.';
+            }
+            updateHabitTracker();
         }
         function getCurrentTime() {
             const now = new Date();
@@ -1015,24 +1523,67 @@
             chatbox.scrollTop = chatbox.scrollHeight;
             showTypingIndicator();
             try {
-                const response = await fetch("/get", {
+                const response = await fetch("/get_stream", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: message, conversation_id: currentConversationId || "" })
                 });
-                removeTypingIndicator();
                 if (!response.ok) throw new Error("Network error");
-                const data = await response.json();
-                lastStressLevel = data.stress_level;
-                if (data.conversation_id && data.conversation_id !== currentConversationId) {
-                    currentConversationId = data.conversation_id;
-                    await loadConversations();
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    // Non-streamed response (crisis, etc.)
+                    removeTypingIndicator();
+                    const data = await response.json();
+                    lastStressLevel = data.stress_level;
+                    if (data.conversation_id && data.conversation_id !== currentConversationId) {
+                        currentConversationId = data.conversation_id;
+                        await loadConversations();
+                    }
+                    const crisisClass = data.stress_level === "CRISIS" ? 'crisis-message' : '';
+                    chatbox.insertAdjacentHTML('beforeend',
+                        '<div class="message bot ' + crisisClass + '"><div class="avatar"><i class="fas fa-heart-pulse"></i></div>' +
+                        '<div class="msg-content"><div class="bubble">' + formatBotText(data.response) + '</div>' +
+                        '<div class="timestamp">' + getCurrentTime() + '</div></div></div>');
+                } else {
+                    // Streaming SSE response
+                    removeTypingIndicator();
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.className = 'message bot';
+                    botMsgDiv.innerHTML = '<div class="avatar"><i class="fas fa-heart-pulse"></i></div>' +
+                        '<div class="msg-content"><div class="bubble"></div>' +
+                        '<div class="timestamp">' + getCurrentTime() + '</div></div>';
+                    chatbox.appendChild(botMsgDiv);
+                    const bubbleEl = botMsgDiv.querySelector('.bubble');
+                    let fullText = '';
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop();
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) continue;
+                            try {
+                                const evt = JSON.parse(line.slice(6));
+                                if (evt.type === 'meta') {
+                                    lastStressLevel = evt.stress_level;
+                                    if (evt.conversation_id && evt.conversation_id !== currentConversationId) {
+                                        currentConversationId = evt.conversation_id;
+                                        loadConversations();
+                                    }
+                                } else if (evt.type === 'chunk') {
+                                    fullText += evt.content;
+                                    bubbleEl.innerHTML = formatBotText(fullText);
+                                    chatbox.scrollTop = chatbox.scrollHeight;
+                                } else if (evt.type === 'done') {
+                                }
+                            } catch (e) {}
+                        }
+                    }
                 }
-                const crisisClass = data.stress_level === "CRISIS" ? 'crisis-message' : '';
-                chatbox.insertAdjacentHTML('beforeend',
-                    '<div class="message bot ' + crisisClass + '"><div class="avatar"><i class="fas fa-heart-pulse"></i></div>' +
-                    '<div class="msg-content"><div class="bubble">' + formatBotText(data.response) + '</div>' +
-                    '<div class="timestamp">' + getCurrentTime() + '</div></div></div>');
             } catch (err) {
                 console.error("Error:", err);
                 removeTypingIndicator();
@@ -1055,24 +1606,163 @@
                 if (data.url) window.open(data.url, '_blank');
             } catch (e) { console.error(e); }
         }
-        function startListening() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert("Voice recognition is not supported in your browser. Try Chrome or Edge.");
+        async function startListening() {
+            if (listeningRequested && recognitionRef) {
+                listeningRequested = false;
+                finalizingVoiceInput = false;
+                if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+                clearRecognitionRestartTimer();
+                // If user manually stops and there's accumulated text, send it
+                if (accumulatedTranscript.trim().length >= 2) {
+                    setListeningUI(false);
+                    setMicStatus('Captured. Sending to MindCare...');
+                    try { recognitionRef.stop(); } catch (e) {}
+                    sendMessage('');
+                    accumulatedTranscript = '';
+                    return;
+                }
+                accumulatedTranscript = '';
+                recognitionRef.stop();
+                setListeningUI(false);
+                setMicStatus('Listening stopped.');
                 return;
             }
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                setMicStatus('Voice recognition is not supported in this browser. Use Chrome or Edge.');
+                return;
+            }
+            if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                setMicStatus('Microphone needs HTTPS or localhost.');
+                return;
+            }
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach((t) => t.stop());
+                } catch (err) {
+                    setMicStatus('Microphone permission denied. Please allow microphone access.');
+                    return;
+                }
+            }
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognitionRef = recognition;
+            finalizingVoiceInput = false;
+            accumulatedTranscript = '';
+            if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
             recognition.lang = "en-US";
-            recognition.interimResults = false;
-            const micBtn = document.getElementById('micBtn');
-            micBtn.classList.add('listening');
-            recognition.start();
-            recognition.onresult = function(event) {
-                micBtn.classList.remove('listening');
-                document.getElementById('user-input').value = event.results[0][0].transcript;
-                sendMessage();
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+            recognition.continuous = true;
+            listeningRequested = true;
+            setListeningUI(true);
+            setMicStatus('Listening... Speak naturally.');
+            recognition.onstart = function() {
+                setListeningUI(true);
             };
-            recognition.onerror = function() { micBtn.classList.remove('listening'); };
-            recognition.onend = function() { micBtn.classList.remove('listening'); };
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i += 1) {
+                    const part = event.results[i][0].transcript || '';
+                    if (event.results[i].isFinal) {
+                        finalTranscript += part + ' ';
+                    } else {
+                        interimTranscript += part + ' ';
+                    }
+                }
+                if (finalTranscript.trim()) {
+                    accumulatedTranscript += finalTranscript;
+                }
+                const input = document.getElementById('user-input');
+                const display = (accumulatedTranscript + interimTranscript).trim();
+                if (input && display) input.value = display;
+                if (silenceTimer) clearTimeout(silenceTimer);
+                if (accumulatedTranscript.trim().length >= 2 || interimTranscript.trim().length >= 2) {
+                    setMicStatus('Listening... (will send after 3s silence)');
+                }
+                if (accumulatedTranscript.trim().length >= 2 && !finalizingVoiceInput) {
+                    silenceTimer = setTimeout(function() {
+                        if (!listeningRequested || finalizingVoiceInput) return;
+                        finalizingVoiceInput = true;
+                        listeningRequested = false;
+                        clearRecognitionRestartTimer();
+                        setListeningUI(false);
+                        setMicStatus('Captured. Sending to MindCare...');
+                        try { recognition.stop(); } catch (e) {}
+                        sendMessage('');
+                    }, SILENCE_TIMEOUT);
+                }
+            };
+            recognition.onerror = function(event) {
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    listeningRequested = false;
+                    finalizingVoiceInput = false;
+                    clearRecognitionRestartTimer();
+                    setListeningUI(false);
+                    setMicStatus('Microphone blocked. Allow permission in browser settings.');
+                    return;
+                }
+                if (event.error === 'no-speech') {
+                    if (listeningRequested) {
+                        setListeningUI(true);
+                        setMicStatus('No speech detected yet. Still listening...');
+                        return;
+                    }
+                    setListeningUI(false);
+                    setMicStatus('No speech detected. Please try again.');
+                    return;
+                }
+                if ((event.error === 'aborted' || event.error === 'audio-capture') && listeningRequested) {
+                    setListeningUI(true);
+                    setMicStatus('Listening interrupted. Retrying...');
+                    return;
+                }
+                listeningRequested = false;
+                finalizingVoiceInput = false;
+                clearRecognitionRestartTimer();
+                setListeningUI(false);
+                setMicStatus('Voice input failed (' + event.error + '). Try again.');
+            };
+            recognition.onend = function() {
+                if (listeningRequested) {
+                    setMicStatus('Still listening...');
+                    clearRecognitionRestartTimer();
+                    recognitionRestartTimer = setTimeout(function() {
+                        if (!listeningRequested) return;
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            setMicStatus('Listening paused. Retrying...');
+                            clearRecognitionRestartTimer();
+                            recognitionRestartTimer = setTimeout(function() {
+                                if (!listeningRequested) return;
+                                try {
+                                    recognition.start();
+                                } catch (err) {
+                                    setMicStatus('Listening paused. Tap mic and speak again.');
+                                    setListeningUI(false);
+                                    listeningRequested = false;
+                                    finalizingVoiceInput = false;
+                                }
+                            }, 450);
+                        }
+                    }, 120);
+                    return;
+                }
+                clearRecognitionRestartTimer();
+                finalizingVoiceInput = false;
+                setListeningUI(false);
+                setMicStatus('Ready. Tap mic to speak.');
+            };
+            try {
+                clearRecognitionRestartTimer();
+                recognition.start();
+            } catch (e) {
+                listeningRequested = false;
+                finalizingVoiceInput = false;
+                setListeningUI(false);
+                setMicStatus('Could not start microphone. Tap mic again.');
+            }
         }
         function showWelcome() {
             const chatbox = document.getElementById('chatbox');
@@ -1105,7 +1795,11 @@
             loadConversations();
             resetMemoryGame();
             resetZenGarden();
+            resetGrounding();
+            loadHabitTracker();
+            generatePrompt();
             applyFontSize();
+            setMicStatus('Ready. Tap mic to speak.');
         };
     </script>
     <script type="text/javascript">

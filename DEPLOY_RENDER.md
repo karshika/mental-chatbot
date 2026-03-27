@@ -47,7 +47,25 @@ Check Render logs for:
 4. Open chat and send a test message.
 5. Verify resources, games, and accessibility tools in chat UI.
 
-## 6. Common issues and fixes
+## 6. Prevent Sleep (Render + Supabase)
+
+This repo now includes an external keep-alive setup:
+
+- Script: `scripts/keep_alive.py`
+- GitHub Actions schedule: `.github/workflows/keepalive.yml`
+- Health endpoint used by keep-alive: `/healthz`
+
+### Configure GitHub repository secrets
+
+Add these secrets in GitHub:
+
+- `KEEPALIVE_RENDER_URL` = your Render app URL (example: `https://mindcare-chatbot.onrender.com`)
+- `KEEPALIVE_SUPABASE_URL` = your Supabase project URL (example: `https://xxxx.supabase.co`)
+- `KEEPALIVE_SUPABASE_KEY` = Supabase anon key or service key
+
+The workflow runs every 10 minutes and sends pings to both services.
+
+## 7. Common issues and fixes
 
 1. Error: `ModuleNotFoundError`
    - Ensure dependency is listed in `requirements.txt`.
